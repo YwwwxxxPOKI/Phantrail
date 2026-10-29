@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#04141a">
 <title>Phantrail</title>
+<script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
@@ -424,6 +425,23 @@ input[type=range]::-moz-range-thumb{
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+#rot{position:fixed;inset:0;z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#04141a;color:#e8f6fa;font:600 16px Sora,system-ui,sans-serif;text-align:center;padding:24px}
+#rot.on{display:flex}
+#rot i{width:34px;height:58px;border:3px solid #ffb02e;border-radius:8px;animation:rotp 1.8s ease-in-out infinite}
+@keyframes rotp{0%,30%{transform:rotate(90deg)}70%,100%{transform:rotate(0)}}
+#boon{position:fixed;inset:0;z-index:60;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:18px;background:rgba(2,10,14,.72);backdrop-filter:blur(6px);font-family:Sora,system-ui,sans-serif;color:#e8f6fa}
+#boon.on{display:flex;animation:bfade .35s both}
+#boon h2{margin:0 0 4px;font-size:20px;letter-spacing:.04em;color:#ffd27a}
+.bc{width:min(340px,100%);display:flex;gap:14px;align-items:center;text-align:left;padding:14px 16px;border-radius:16px;border:1.5px solid var(--c);background:rgba(8,28,36,.85);color:inherit;font:inherit;cursor:pointer;animation:bpop .45s both;animation-delay:calc(var(--n)*.09s);box-shadow:0 0 22px -8px var(--c)}
+.bc:active{transform:scale(.97)}
+.bc b{font-size:15px;display:block}.bc span{font-size:12.5px;opacity:.75}
+.bc em{font-style:normal;font-size:26px;width:44px;text-align:center;color:var(--c)}
+@keyframes bpop{from{opacity:0;transform:translateY(18px) scale(.94)}}
+@keyframes bfade{from{opacity:0}}
+#orank{margin-top:10px;font-size:13px;opacity:.9}
+#orank u{display:block;height:6px;border-radius:6px;background:rgba(255,255,255,.12);margin-top:6px;overflow:hidden;text-decoration:none}
+#orank u i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffb02e,#ffd27a);transition:width 1.2s .5s cubic-bezier(.2,.8,.2,1)}
 </style>
 </head>
 <body>
@@ -579,6 +597,8 @@ input[type=range]::-moz-range-thumb{
 </div></div>
 
 <!-- OYUN SONU -->
+<div id="rot"><i></i><div id="rotT"></div></div>
+<div id="boon"></div>
 <div id="over" class="screen off"><div class="panel glass center small">
   <div id="ot" class="ot st" style="--i:0"></div>
   <div class="stars st" id="ostars" style="--i:1"></div>
@@ -586,6 +606,8 @@ input[type=range]::-moz-range-thumb{
   <p id="ob" class="gold st" style="--i:3"></p>
   <p id="om" class="muted st" style="--i:3"></p>
   <div class="earn st" style="--i:4"><svg class="ico"><use href="#i-coin"/></svg><span id="oc"></span></div>
+  <div id="orank" class="st" style="--i:4"></div>
+  <button id="oAd" class="btn st" style="--i:5;display:none" onclick="rewardDouble()"><span id="oAdT"></span></button>
   <div class="st" style="--i:5"><button class="btn main calm" style="margin-top:18px" onclick="play()"><svg class="ico"><use href="#i-redo"/></svg><span data-i="again"></span></button></div>
   <button class="btn st" style="--i:6" onclick="show('shop')"><svg class="ico"><use href="#i-shop"/></svg><span data-i="shop"></span></button>
   <button class="btn st" style="--i:7" onclick="toMenu()"><svg class="ico"><use href="#i-home"/></svg><span data-i="menu"></span></button>
@@ -655,7 +677,7 @@ const tiltLive = () => performance.now() - TILT.t < 800;
 const useTilt = () => S.ctrl === 'tilt' && !tiltFail;
 function tiltAngles(u) { return { roll: Math.asin(clamp(-u[0], -1, 1)), pitch: Math.atan2(u[2], u[1]) }; }
 function onOrient(e) {
-  if (e.beta == null || e.gamma == null) return;
+  if (e.beta == null || e.gamma == null || ROT) return;
   const b = e.beta * Math.PI / 180, g = e.gamma * Math.PI / 180;
   /* dünya "yukarı" yönü, cihaz eksenlerinde */
   const dx = -Math.sin(g) * Math.cos(b), dy = Math.sin(b), dz = Math.cos(g) * Math.cos(b);
@@ -697,6 +719,93 @@ function tiltStep() {
   const ux = tx / mag, uy = ty / mag;
   TILT.gx = ux * k; TILT.gy = uy * k;
   return [ux * f, -uy * f];
+}
+
+
+/* ---------- Yerel metin yardımcısı (TR / EN) ---------- */
+const isTR = () => String(S.lang || document.documentElement.lang || navigator.language || 'tr').slice(0, 2) === 'tr';
+const tx = (tr, en) => isTR() ? tr : en;
+
+/* ---------- CrazyGames SDK v3 ---------- */
+const CG = { ok: false, playing: false, busy: false, runs: 0 };
+const cgS = () => window.CrazyGames && window.CrazyGames.SDK;
+async function cgInit() {
+  try { if (cgS()) { await cgS().init(); CG.ok = true; cgS().game.loadingStart(); } } catch (e) { CG.ok = false; }
+}
+function cgLoaded() { if (CG.ok) try { cgS().game.loadingStop(); } catch (e) { /* yok say */ } }
+function cgPlay(on) {
+  if (!CG.ok || CG.playing === on) return; CG.playing = on;
+  try { on ? cgS().game.gameplayStart() : cgS().game.gameplayStop(); } catch (e) { /* yok say */ }
+}
+function cgHappy() { if (CG.ok) try { cgS().game.happytime(); } catch (e) { /* yok say */ } }
+/* reklam: ses kapanır, oyun durur; bitince / hata verince done(başarılı_mı) çağrılır */
+function cgAd(type, done) {
+  if (!CG.ok || CG.busy) { done(false); return; }
+  CG.busy = true; cgPlay(false);
+  const was = muted; let fin = false;
+  const end = ok => { if (fin) return; fin = true; CG.busy = false; muted = was; setVolumes(); last = performance.now(); done(ok); };
+  try {
+    cgS().ad.requestAd(type, {
+      adStarted: () => { muted = true; setVolumes(); },
+      adFinished: () => end(true),
+      adError: () => end(false)
+    });
+  } catch (e) { end(false); }
+}
+function rewardDouble() {
+  $('oAd').style.display = 'none';
+  cgAd('rewarded', ok => { if (ok) { S.coins += earned; sv(); $('oc').textContent = t('earned') + ': +' + earned * 2; menuStats(); SFX.gem(); } else $('oAd').style.display = ''; });
+}
+
+/* ---------- Dikey kilit: ekran dönerse oyun donar, geri dönünce kaldığı yerden devam ---------- */
+let ROT = false;
+function lockPortrait() { try { const o = screen.orientation; if (o && o.lock) o.lock('portrait').catch(() => { /* destek yok */ }); } catch (e) { /* destek yok */ } }
+function rotGuard() {
+  ROT = TOUCHDEV && innerWidth > innerHeight * 1.1 && Math.min(screen.width, screen.height) < 700;
+  $('rotT').textContent = tx('Telefonu dikey tut', 'Please rotate your phone upright');
+  $('rot').classList.toggle('on', ROT);
+  if (ROT && (st === 'play' || st === 'count')) pauseT();
+  return ROT;
+}
+
+/* ---------- Yükseltme seçimi ("Pakt"): her seviye atlayışında 3 karttan biri ---------- */
+let B = { spd: 1, life: 1, coin: 0, cw: 0, mg: 0, sc: 1, lag: 0 };
+const BOONS = [
+  { g: '⚡', c: '#7fe9ff', n: ['Hafif Ayak', 'Light Feet'], d: ['%12 daha hızlı hareket', '12% faster movement'], f: () => B.spd *= 1.12 },
+  { g: '⏳', c: '#ffd27a', n: ['Uzun Parıltı', 'Lingering Glow'], d: ['Kristaller %25 daha uzun kalır', 'Shards last 25% longer'], f: () => B.life *= 1.25 },
+  { g: '◎', c: '#7dffc8', n: ['Çekim', 'Pull'], d: ['Toplama menzili +14', 'Pickup range +14'], f: () => B.mg += 14 },
+  { g: '✦', c: '#ff9ad5', n: ['Akış', 'Flow'], d: ['Kombo süresi +1.2 sn', 'Combo timer +1.2s'], f: () => B.cw += 1.2 },
+  { g: '◆', c: '#7dffc8', n: ['Açgözlü', 'Greedy'], d: ['Kazanılan jeton +%30', 'Coins earned +30%'], f: () => B.coin += .3 },
+  { g: '★', c: '#ffb02e', n: ['Altın Dokunuş', 'Golden Touch'], d: ['Puanlar +%25', 'Score +25%'], f: () => B.sc *= 1.25 },
+  { g: '⛨', c: '#9ff0ff', n: ['Kalkan Işıltısı', 'Aegis Spark'], d: ['Hemen bir kalkan kazan', 'Gain a shield now'], ok: () => !shield, f: () => { shield = true; } },
+  { g: '✺', c: '#c9a8ff', n: ['Yankı Süpürme', 'Echo Purge'], d: ['Tüm yankıları sil', 'Wipe all echoes'], ok: () => ghosts.length >= 2, f: () => clearGhosts(true) },
+  { g: '◌', c: '#9cc0ff', n: ['Geç Gölge', 'Late Shadow'], d: ['Yeni yankılar 0.4 sn daha geriden gelir', 'New echoes trail 0.4s further'], f: () => B.lag += .4 }
+];
+function offerBoons() {
+  st = 'boon';
+  const list = BOONS.filter(b => !b.ok || b.ok()).sort(() => Math.random() - .5).slice(0, 3);
+  const el = $('boon'), k = isTR() ? 0 : 1;
+  el.innerHTML = `<h2>${tx('Bir güç seç', 'Choose a boon')}</h2>` + list.map((b, i) =>
+    `<button class="bc" style="--c:${b.c};--n:${i}" data-i="${BOONS.indexOf(b)}"><em>${b.g}</em><div><b>${b.n[k]}</b><span>${b.d[k]}</span></div></button>`).join('');
+  el.querySelectorAll('.bc').forEach(btn => btn.onclick = () => {
+    const b = BOONS[+btn.dataset.i]; b.f(); el.classList.remove('on');
+    ring(P.x, P.y, '255,210,120', 500, .7, 3); burst(P.x, P.y, b.c, 22, 300, 'st'); SFX.gem(); vib(20);
+    st = 'play'; last = performance.now(); updateHud();
+  });
+  setTimeout(() => { if (st === 'boon') el.classList.add('on'); }, 650);
+}
+
+/* ---------- Rütbe (kalıcı ilerleme) ---------- */
+const rankNeed = r => 80 * r * (r + 1) / 2 * 1;
+function rankOf(xp) { let r = 0; while (xp >= rankNeed(r + 1)) r++; return r; }
+function giveXp(x) {
+  const before = rankOf(S.xp || 0); S.xp = (S.xp || 0) + x; const after = rankOf(S.xp);
+  let bonus = 0; for (let r = before + 1; r <= after; r++) bonus += 50 * r;
+  S.coins += bonus;
+  const lo = rankNeed(after), hi = rankNeed(after + 1), pct = Math.round((S.xp - lo) / (hi - lo) * 100);
+  $('orank').innerHTML = `${tx('Rütbe', 'Rank')} ${after} · +${x} XP${bonus ? ' · +' + bonus + ' ' + t('coin') : ''}<u><i id="orBar"></i></u>`;
+  setTimeout(() => { const b = $('orBar'); if (b) b.style.width = pct + '%'; }, 60);
+  if (after > before) showToast('starf', 'b-cyan', tx('Rütbe atladın!', 'Rank up!'), tx('Yeni rütbe: ', 'New rank: ') + after);
 }
 
 /* ---------- Diller ---------- */
@@ -1633,7 +1742,7 @@ function reset() {
 function addGhost() {
   const c = cfg();
   if (ghosts.length >= c.max) return false;
-  ghosts.push({ lag: Math.round((c.lag + c.gap * ghosts.length) * 60), x: 0, y: 0, r: 10, f: 0, on: 0, cd: 0, ph: Math.random() * TAU });
+  ghosts.push({ lag: Math.round((c.lag + B.lag + c.gap * ghosts.length) * 60), x: 0, y: 0, r: 10, f: 0, on: 0, cd: 0, ph: Math.random() * TAU });
   return true;
 }
 
@@ -1709,25 +1818,27 @@ function pickSpot(avoid, targetMd) {
 }
 function newShard() {
   const p = pickSpot([orb], lerp(135, 62, (level - 1) / 4));
-  const life = cfg().life * (1 + .15 * S.up.u1);
+  const life = cfg().life * (1 + .15 * S.up.u1) * B.life;
   shard = { x: p.x, y: p.y, life, max: life, age: 0 };
   ring(p.x, p.y, '255,176,46', 160, .5, 2);
 }
 function spawnOrb() {
-  const opts = ['gem'];
+  const opts = ['gem', 'surge'];
+  if (ghosts.length >= 2) opts.push('chrono', 'chrono');
   if (!shield) opts.push('shield', 'shield');
   if (ghosts.length >= 3) opts.push('nova', 'nova');
   const type = pick(opts), p = pickSpot([shard], 90);
   orb = { type, x: p.x, y: p.y, life: 9, max: 9, age: 0 };
   ring(p.x, p.y, type === 'nova' ? '190,150,255' : type === 'shield' ? '127,233,255' : '125,255,200', 200, .6, 2);
 }
-const ORBC = { shield: ['127,233,255', '#7fe9ff'], nova: ['190,150,255', '#c9a8ff'], gem: ['125,255,200', '#7dffc8'] };
+let surge = 0, chrono = 0;
+const ORBC = { chrono: ['150,190,255', '#9cc0ff'], surge: ['255,110,200', '#ff7ac8'], shield: ['127,233,255', '#7fe9ff'], nova: ['190,150,255', '#c9a8ff'], gem: ['125,255,200', '#7dffc8'] };
 
 /* ---------- Toplama, seviye, ölüm ---------- */
 function collect() {
-  combo = comboT > 0 ? Math.min(8, combo + 1) : 1; comboT = COMBO_WIN;
+  combo = comboT > 0 ? Math.min(8, combo + 1) : 1; comboT = COMBO_WIN + B.cw;
   shards++; inLevel++; S.st.k++; S.st.combo = Math.max(S.st.combo, combo);
-  const p = 100 * combo; score += p;
+  const p = Math.round(100 * combo * B.sc * (surge > 0 ? 2 : 1)); score += p;
   const x = shard.x, y = shard.y, sk = curSkin();
   burst(x, y, '#' + (sk.core.slice(1)), 18, 320, 'st'); burst(x, y, '#ffb02e', 14, 280);
   ring(x, y, '255,200,90', 420, .6, 3);
@@ -1755,16 +1866,17 @@ function levelUp() {
   burst(P.x, P.y, '#ffd27a', 40, 420, 'st');
   SFX.level(); vib(40);
   showBanner(t('lv') + ' ' + level, t('lvUp'), '#ffb02e', 1.8);
-  updateHud(); checkAch();
+  updateHud(); checkAch(); cgHappy(); offerBoons();
 }
 function die() {
-  st = 'dead'; slow = .22; shake = 26; flash = 1; flashC = '255,90,95'; zoom = 1.06;
+  cgPlay(false); st = 'dead'; slow = .22; shake = 26; flash = 1; flashC = '255,90,95'; zoom = 1.06;
   burst(P.x, P.y, curSkin().core, 44, 420, 'sq'); burst(P.x, P.y, '#ff5a5f', 32, 380, 'ci');
   ring(P.x, P.y, '255,90,95', 700, .9, 5);
   SFX.die(); vib([60, 40, 90]); musFilter(500);
   finish(false);
 }
 function finish(win) {
+  cgPlay(false);
   if (win) {
     st = 'won'; SFX.win(); vib([30, 30, 30, 30, 80]); score += 500;
     showBanner(t('win'), '', '#ffd24a', 2);
@@ -1773,7 +1885,7 @@ function finish(win) {
     }, i * 160));
   }
   S.st.games++; if (win) S.st.wins++;
-  const mult = 1 + .1 * S.up.u3;
+  const mult = 1 + .1 * S.up.u3 + B.coin;
   earned = Math.round((Math.floor(score / 60) + bonusCoins + (win ? 150 : 0)) * mult);
   S.coins += earned;
   S.sc.push({ s: score, k: shards, w: win ? 1 : 0, lv: level, m: S.map });
@@ -1791,6 +1903,8 @@ function finish(win) {
     $('oc').textContent = t('earned') + ': +' + earned;
     $('hud').classList.add('off'); st = 'over'; show('over');
     countUp($('os'), score, 1100);
+    giveXp(Math.floor(score / 40) + level * 10 + (win ? 100 : 0)); sv();
+    $('oAdT').textContent = tx('Reklam izle: jetonlar x2', 'Watch ad: double coins'); $('oAd').style.display = CG.ok ? '' : 'none';
     menuStats();
   }, win ? 2000 : 1100);
 }
@@ -1808,12 +1922,12 @@ function step() {
   tick++; if (invul > 0) invul--;
   const kx = (keys.ArrowRight || keys.d ? 1 : 0) - (keys.ArrowLeft || keys.a ? 1 : 0);
   const ky = (keys.ArrowDown || keys.s ? 1 : 0) - (keys.ArrowUp || keys.w ? 1 : 0);
-  const sp = SPEED * sc() / 60; let vx = 0, vy = 0;
+  const sp = SPEED * sc() * B.spd / 60; let vx = 0, vy = 0;
   const demo = st === 'menu' || st === 'intro';
   if (demo) { const q = tick / 60; tgt.x = W / 2 + Math.cos(q * .9) * W * .3; tgt.y = H * .55 + Math.sin(q * 1.3) * H * .22; }
   if (kx || ky) { const l = Math.hypot(kx, ky); vx = kx / l * sp; vy = ky / l * sp; tgt.x = P.x; tgt.y = P.y; }
   else if (!demo && (st === 'play' || st === 'count') && useTilt()) {
-    const r = tiltStep(), ts = TILT_SPEED * sc() / 60;
+    const r = tiltStep(), ts = TILT_SPEED * sc() * B.spd / 60;
     vx = r[0] * ts; vy = r[1] * ts; tgt.x = P.x; tgt.y = P.y;
   }
   else {
@@ -1828,8 +1942,13 @@ function step() {
   emitFx();
 
   /* yankılar: oyuncunun geçmiş izini tekrar oynar */
+  if (st === 'play') {
+    if (chrono > 0) chrono -= 1 / 60;
+    if (surge > 0) { surge -= 1 / 60; comboT = Math.max(comboT, .6); if (tick % 4 === 0) burst(P.x, P.y, '#ff7ac8', 1, 90, 'st'); }
+  }
   let nearest = 1e9;
   for (const g of ghosts) {
+    if (chrono > 0 && tick % 3) g.lag++;
     const i = tick - g.lag - hoff;
     if (i < 0 || i >= hist.length) { g.on = 0; continue; }
     g.on = 1; g.x = hist[i][0]; g.y = hist[i][1]; g.f = Math.min(1, g.f + 1 / 72); g.cd--;
@@ -1862,7 +1981,7 @@ function step() {
     shard.age += 1 / 60; shard.life -= 1 / 60;
     const ml = S.up.u0, dx = P.x - shard.x, dy = P.y - shard.y, d = Math.hypot(dx, dy);
     if (ml && d < MAGNET.pull[ml] && d > 1) { const f = (1 - d / MAGNET.pull[ml]) * 3.2 * (ml * .5 + .5); shard.x += dx / d * f; shard.y += dy / d * f; }
-    if (Math.hypot(P.x - shard.x, P.y - shard.y) < P.r + 16 + MAGNET.grab[ml]) collect();
+    if (Math.hypot(P.x - shard.x, P.y - shard.y) < P.r + 16 + MAGNET.grab[ml] + B.mg) collect();
     else if (shard.life <= 0) {
       combo = 1; comboT = 0; missLv++;
       burst(shard.x, shard.y, '#7a5a20', 14, 220); txt(shard.x, shard.y, t('miss'), '#ff9a9d', 20); SFX.miss();
@@ -1885,7 +2004,9 @@ function takeOrb() {
   else if (o.type === 'nova') {
     clearGhosts(true); SFX.nova(); flash = .5; flashC = '190,150,255'; shake = 14; zoom = 1.035;
     ring(o.x, o.y, '190,150,255', 1100, 1.1, 6); txt(o.x, o.y - 24, t('oNova'), '#d8c0ff', 22);
-  } else { bonusCoins += 25; score += 250; SFX.gem(); txt(o.x, o.y - 24, '+25 ' + t('coin'), '#7dffc8', 20); }
+  } else if (o.type === 'chrono') { chrono = 5; flash = .4; flashC = '150,190,255'; ring(P.x, P.y, '150,190,255', 900, 1, 5); txt(o.x, o.y - 24, tx('Zaman Durdu', 'Time Freeze'), '#bcd4ff', 22); SFX.nova(); }
+  else if (o.type === 'surge') { surge = 8; flash = .35; flashC = '255,110,200'; ring(P.x, P.y, '255,110,200', 800, 1, 5); txt(o.x, o.y - 24, tx('Aşırı Yük x2', 'Overdrive x2'), '#ff9ad5', 22); SFX.level(); }
+  else { bonusCoins += 25; score += 250; SFX.gem(); txt(o.x, o.y - 24, '+25 ' + t('coin'), '#7dffc8', 20); }
   vib(25); updateHud();
 }
 
@@ -1906,11 +2027,11 @@ function update(rdt) {
       calibrate();
       if (tiltBound && countT > 1.6 && !tiltLive()) failTilt();
     }
-    if (countT >= 2.45) { st = 'play'; newShard(); updateHud(); }
+    if (countT >= 2.45) { st = 'play'; cgPlay(true); newShard(); updateHud(); }
   }
   if (st === 'play' || st === 'menu' || st === 'intro' || st === 'count') {
     acc += rdt;
-    while (acc >= 1 / 60) { acc -= 1 / 60; step(); if (st === 'dead' || st === 'won') break; }
+    while (acc >= 1 / 60) { acc -= 1 / 60; step(); if (st === 'dead' || st === 'won' || st === 'boon') break; }
   }
   const dt = rdt * slow;
   for (const p of parts) { p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= .96; p.vy *= .96; p.l -= dt; }
@@ -1920,7 +2041,7 @@ function update(rdt) {
   for (const r of rings) { r.r += r.v * dt; r.l -= dt; }
   rings = rings.filter(r => r.l > 0);
   shake *= .88; flash *= .9; zoom += (1 - zoom) * Math.min(1, rdt * 6);
-  if (st === 'play') $('hcb').style.transform = `scaleX(${comboT / COMBO_WIN})`;
+  if (st === 'play') $('hcb').style.transform = `scaleX(${Math.min(1, comboT / (COMBO_WIN + B.cw))})`;
 }
 /* =========================================================
    ÇİZİM
@@ -2008,6 +2129,11 @@ function drawOrb(c, o) {
   } else if (o.type === 'nova') {
     starPath(c, 0, 0, 10, 4, 8, T * 1.5); c.fill(); c.stroke();
     c.fillStyle = '#fff'; c.beginPath(); c.arc(0, 0, 2.6, 0, TAU); c.fill();
+  } else if (o.type === 'chrono') {
+    c.beginPath(); c.arc(0, 0, 8, 0, TAU); c.globalAlpha = .9; c.fill(); c.globalAlpha = 1; c.stroke();
+    c.beginPath(); c.moveTo(0, -5); c.lineTo(0, 0); c.lineTo(4, 2); c.strokeStyle = '#06141a'; c.lineWidth = 2; c.stroke();
+  } else if (o.type === 'surge') {
+    c.beginPath(); c.moveTo(3, -10); c.lineTo(-6, 1); c.lineTo(-1, 1); c.lineTo(-3, 10); c.lineTo(6, -2); c.lineTo(1, -2); c.closePath(); c.fill(); c.stroke();
   } else {
     c.beginPath(); c.moveTo(-7, -4); c.lineTo(-3.5, -9); c.lineTo(3.5, -9); c.lineTo(7, -4); c.lineTo(0, 9); c.closePath();
     c.fill(); c.stroke();
@@ -2401,8 +2527,9 @@ function hudTick(rdt) {
 }
 
 /* ---------- Oyun akışı: başlat, duraklat, çık ---------- */
-function play() {
-  initAudio(); clearTimeout(overTimer);
+function play(skipAd) {
+  if (st === 'over' && !skipAd && CG.ok && ++CG.runs % 2 === 0) { cgAd('midgame', () => play(true)); return; }
+  initAudio(); clearTimeout(overTimer); lockPortrait(); B = { spd: 1, life: 1, coin: 0, cw: 0, mg: 0, sc: 1, lag: 0 }; surge = chrono = 0; $('boon').classList.remove('on');
   /* eğim izni, dokunuş olayının içinde (senkron) istenmeli: o yüzden en başta */
   tiltFail = false;
   if (S.ctrl === 'tilt') startTilt().then(ok => { if (!ok && S.ctrl === 'tilt') failTilt(); });
@@ -2418,13 +2545,13 @@ function play() {
 function restart() { play(); }
 function pauseT() {
   if (st === 'play' || st === 'count') {
-    prevSt = st; st = 'pause'; musFilter(600);
+    prevSt = st; st = 'pause'; cgPlay(false); musFilter(600);
     $('pi').textContent = `${t('lv')} ${level} · ${shards} ${t('k')} · ${fmt(score)}`;
     $('pb').querySelector('use').setAttribute('href', '#i-play');
     $('pCal').style.display = useTilt() ? '' : 'none';
     show('pause');
   } else if (st === 'pause') {
-    st = prevSt; show(null); musFilter(20000); last = performance.now();
+    st = prevSt; show(null); cgPlay(true); musFilter(20000); last = performance.now();
     if (useTilt()) calibrate();   /* devam ederken telefonun duruşu yeni merkez */
     $('pb').querySelector('use').setAttribute('href', '#i-pause');
   }
@@ -2434,7 +2561,7 @@ function demoReset() {
   level = 1; shield = false; combo = 1; comboT = 0; inLevel = 0; reset(); addGhost(); addGhost();
 }
 function toMenu() {
-  clearTimeout(overTimer); st = 'menu'; demoReset();
+  clearTimeout(overTimer); cgPlay(false); st = 'menu'; demoReset();
   $('hud').classList.add('off'); musFilter(20000); show('menu'); menuStats();
 }
 
@@ -2445,14 +2572,14 @@ function buildIntro() {
   const minWait = new Promise(r => setTimeout(r, 2300));
   const fonts = (document.fonts && document.fonts.ready)
     ? Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 2500))]) : Promise.resolve();
-  Promise.all([minWait, fonts]).then(() => { introReady = true; $('intro').classList.add('ready'); measure(); });
+  Promise.all([minWait, fonts]).then(() => { introReady = true; cgLoaded(); $('intro').classList.add('ready'); measure(); });
   /* harfler yerine oturdukça tuvalde ışık patlamaları */
   setTimeout(() => { ring(W / 2, H * .42, '255,176,46', 520, 1.2, 3); burst(W / 2, H * .42, '#ffd27a', 26, 300, 'st'); }, 950);
   setTimeout(() => { ring(W / 2, H * .42, '255,90,95', 760, 1.4, 2); burst(W / 2, H * .42, '#ff5a5f', 18, 260, 'ci'); }, 1500);
 }
 function leaveIntro() {
   if (!introReady || introDone) return;
-  introDone = true; initAudio(); SFX.whoosh(); vib(15);
+  introDone = true; initAudio(); lockPortrait(); SFX.whoosh(); vib(15);
   $('intro').classList.add('leave');
   st = 'menu'; show('menu'); menuStats();
   ring(W / 2, H / 2, '255,200,90', 900, .9, 4); burst(W / 2, H / 2, '#ffd27a', 30, 380, 'st');
@@ -2494,8 +2621,9 @@ addEventListener('contextmenu', e => e.preventDefault());
 function refreshScreen() {
   if (curScreen === 'shop') renderShop();
 }
-function onResize() { resize(); buildRVig(); setTimeout(measure, 60); refreshScreen(); }
+function onResize() { if (rotGuard()) return; resize(); buildRVig(); setTimeout(measure, 60); refreshScreen(); }
 addEventListener('resize', onResize);
+document.addEventListener('visibilitychange', () => { if (document.hidden && (st === 'play' || st === 'count')) pauseT(); });
 addEventListener('orientationchange', () => setTimeout(onResize, 200));
 
 /* ---------- Ana döngü ---------- */
@@ -2509,8 +2637,8 @@ function loop(now) {
 }
 
 /* ---------- Başlangıç ---------- */
-loadSave();
-applyLang();
+loadSave(); S.xp = S.xp || 0;
+applyLang(); cgInit();
 onResize();
 setMap();
 demoReset();
