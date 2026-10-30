@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#04141a">
 <title>Phantrail</title>
 <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;700;800&display=swap" rel="stylesheet">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <style>
 /* =========================================================
    PHANTRAIL 2.0 - Stil
@@ -28,7 +28,7 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{
   margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--cream);
-  font-family:'Sora',system-ui,sans-serif;touch-action:none;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;touch-action:none;
   user-select:none;-webkit-user-select:none;
 }
 button{font-family:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
@@ -426,11 +426,11 @@ input[type=range]::-moz-range-thumb{
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
 
-#rot{position:fixed;inset:0;z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#04141a;color:#e8f6fa;font:600 16px Sora,system-ui,sans-serif;text-align:center;padding:24px}
+#rot{position:fixed;inset:0;z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#04141a;color:#e8f6fa;font:600 16px system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;text-align:center;padding:24px}
 #rot.on{display:flex}
 #rot i{width:34px;height:58px;border:3px solid #ffb02e;border-radius:8px;animation:rotp 1.8s ease-in-out infinite}
 @keyframes rotp{0%,30%{transform:rotate(90deg)}70%,100%{transform:rotate(0)}}
-#boon{position:fixed;inset:0;z-index:60;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:18px;background:rgba(2,10,14,.72);backdrop-filter:blur(6px);font-family:Sora,system-ui,sans-serif;color:#e8f6fa}
+#boon{position:fixed;inset:0;z-index:60;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:18px;background:rgba(2,10,14,.72);backdrop-filter:blur(6px);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;color:#e8f6fa}
 #boon.on{display:flex;animation:bfade .35s both}
 #boon h2{margin:0 0 4px;font-size:20px;letter-spacing:.04em;color:#ffd27a}
 .bc{width:min(340px,100%);display:flex;gap:14px;align-items:center;text-align:left;padding:14px 16px;border-radius:16px;border:1.5px solid var(--c);background:rgba(8,28,36,.85);color:inherit;font:inherit;cursor:pointer;animation:bpop .45s both;animation-delay:calc(var(--n)*.09s);box-shadow:0 0 22px -8px var(--c)}
@@ -442,6 +442,11 @@ input[type=range]::-moz-range-thumb{
 #orank{margin-top:10px;font-size:13px;opacity:.9}
 #orank u{display:block;height:6px;border-radius:6px;background:rgba(255,255,255,.12);margin-top:6px;overflow:hidden;text-decoration:none}
 #orank u i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffb02e,#ffd27a);transition:width 1.2s .5s cubic-bezier(.2,.8,.2,1)}
+
+/* ---------- Reklam alanları ---------- */
+#cgBanner{display:none;margin:14px auto 0;max-width:100%;min-height:50px;overflow:hidden;text-align:center}
+.rr{display:flex;align-items:center;gap:8px;margin-top:6px;padding:11px 18px;border-radius:14px;border:1px solid rgba(255,210,122,.5);background:rgba(255,176,46,.12);color:#ffd27a;font-weight:700;font-size:14px;font-family:inherit;cursor:pointer}
+.rr .ico{font-size:18px}.rr:disabled{opacity:.5}
 </style>
 </head>
 <body>
@@ -556,6 +561,7 @@ input[type=range]::-moz-range-thumb{
 <div id="shop" class="screen off"><div class="panel glass">
   <div class="hdr st" style="--i:0"><button class="rbtn" onclick="back()" aria-label="Back"><svg class="ico"><use href="#i-back"/></svg></button><h2 data-i="shop"></h2><span class="stat" id="sc"></span></div>
   <div class="tabs st" style="--i:1" id="shopTabs"></div>
+  <button id="shopAd" class="btn st" style="--i:2;display:none" onclick="rewardCoins()"><svg class="ico"><use href="#i-coin"/></svg><span id="shopAdT"></span></button>
   <div id="sl"></div>
 </div></div>
 
@@ -570,7 +576,6 @@ input[type=range]::-moz-range-thumb{
   <div class="set-sub st" style="--i:6"><span class="badge b-cyan"><svg class="ico"><use href="#i-cursor"/></svg></span><span data-i="ctrl"></span></div>
   <div class="langs st" style="--i:7" id="cg"></div>
   <div class="set-row st" id="sensRow" style="--i:8"><span class="badge b-amber"><svg class="ico"><use href="#i-sliders"/></svg></span><span class="lbl" data-i="sens"></span><input id="vsn" type="range" min=".5" max="1.6" step=".05" oninput="onSens(this)" onchange="sv()"></div>
-  <div class="langs st" style="--i:8" id="tg"></div>
   <div class="set-sub st" style="--i:9"><span class="badge b-green"><svg class="ico"><use href="#i-globe"/></svg></span><span data-i="lang"></span></div>
   <div class="langs st" style="--i:10" id="lg"></div>
 </div></div>
@@ -612,6 +617,7 @@ input[type=range]::-moz-range-thumb{
   <div class="st" style="--i:5"><button class="btn main calm" style="margin-top:18px" onclick="play()"><svg class="ico"><use href="#i-redo"/></svg><span data-i="again"></span></button></div>
   <button class="btn st" style="--i:6" onclick="show('shop')"><svg class="ico"><use href="#i-shop"/></svg><span data-i="shop"></span></button>
   <button class="btn st" style="--i:7" onclick="toMenu()"><svg class="ico"><use href="#i-home"/></svg><span data-i="menu"></span></button>
+  <div id="cgBanner"></div>
 </div></div>
 
 <script>
@@ -640,9 +646,9 @@ const PER = 10;            // seviye başına kristal
 const LEVELS = 5;          // kazanmak için biten seviye sayısı
 const COMBO_WIN = 3.2;     // kombo süresi (sn)
 const SPEED = 300;         // oyuncu hızı (px/sn), dokunmatik / klavye
-const TILT_SPEED = 560;    // eğim kontrolünde azami hız (px/sn)
-const TILT_DEAD = 1.5;     // ölü bölge (derece)
-const TILT_FULL = 15;      // tam hız için gereken eğim (derece, hassasiyet 1)
+const TILT_SPEED = 470;    // eğim kontrolünde azami hız (px/sn)
+const TILT_DEAD = 1.2;     // ölü bölge (derece)
+const TILT_FULL = 20;      // tam hız için gereken eğim (derece, hassasiyet 1)
 
 /* Her seviye biraz daha zor; ama yankılar her seviye atlayışında silinir */
 const DIFF = [
@@ -656,13 +662,13 @@ const DIFF = [
 /* ---------- Durum ---------- */
 let st = 'intro', prevSt = 'menu', curScreen = null;
 let score = 0, shards = 0, level = 1, inLevel = 0, combo = 1, comboT = 0, missLv = 0;
-let bonusCoins = 0, runNear = 0, orbCd = 3, spawnDelay = 0, countT = 0;
+let bonusCoins = 0, nearCoins = 0, runNear = 0, orbCd = 3, spawnDelay = 0, countT = 0;
 let tick = 0, T = 0, acc = 0, demoT = 0, shake = 0, flash = 0, flashC = '255,90,95', slow = 1, zoom = 1;
 let invul = 0, shield = false, danger = 0, earned = 0, muted = false, introDone = false;
 let last = performance.now(), frame = 0, animIn = false;
 const P = { x: 0, y: 0, vx: 0, vy: 0, r: 9 }, tgt = { x: 0, y: 0 };
 let hist = [], ghosts = [], shard = null, orb = null, parts = [], texts = [], rings = [], keys = {}, previews = [];
-let bgState = null;
+let bgState = null, GRAIN = null, GPAT = null, DUST = null, gOff = [0, 0];
 const sc = () => clamp(Math.min(W, H) / 700, .75, 1.25);
 const TOUCHDEV = (navigator.maxTouchPoints || 0) > 0 || (window.matchMedia && matchMedia('(pointer:coarse)').matches);
 
@@ -676,7 +682,8 @@ let tiltBound = false, tiltFail = false;
 const wrapA = a => Math.atan2(Math.sin(a), Math.cos(a));
 const tiltLive = () => performance.now() - TILT.t < 800;
 const useTilt = () => S.ctrl === 'tilt' && !tiltFail;
-function tiltAngles(u) { return { roll: Math.asin(clamp(-u[0], -1, 1)), pitch: Math.atan2(u[2], u[1]) }; }
+/* MUTLAK mod: telefon yatay (ekran yukarı) = 0. Başlangıç duruşu merkez alınmaz. */
+function tiltAngles(u) { return { roll: Math.asin(clamp(-u[0], -1, 1)), pitch: Math.asin(clamp(-u[1], -1, 1)) }; }
 function onOrient(e) {
   if (e.beta == null || e.gamma == null || ROT) return;
   const b = e.beta * Math.PI / 180, g = e.gamma * Math.PI / 180;
@@ -688,7 +695,7 @@ function onOrient(e) {
   const a = deg * Math.PI / 180, ca = Math.cos(a), sa = Math.sin(a);
   const sx = dx * ca - dy * sa, sy = dx * sa + dy * ca, sz = dz;
   if (!TILT.has || deg !== TILT.ang) { TILT.up = [sx, sy, sz]; TILT.has = true; TILT.ang = deg; TILT.n = tiltAngles(TILT.up); }
-  else { const k = .3; TILT.up = [lerp(TILT.up[0], sx, k), lerp(TILT.up[1], sy, k), lerp(TILT.up[2], sz, k)]; }
+  else { const k = .4; TILT.up = [lerp(TILT.up[0], sx, k), lerp(TILT.up[1], sy, k), lerp(TILT.up[2], sz, k)]; }
   TILT.t = performance.now();
   if (tiltFail && S.ctrl === 'tilt') tiltFail = false;   /* izin geç verildiyse eğime geri dön */
 }
@@ -702,7 +709,7 @@ async function startTilt() {
   } catch (e) { /* veri gelmezse geri sayımda yakalanır */ }
   return true;
 }
-function calibrate() { if (S.tiltRef === 'start' && TILT.has) TILT.n = tiltAngles(TILT.up); }
+function calibrate() { /* mutlak modda gerek yok: sıfır noktası daima yatay */ }
 function failTilt() {
   if (tiltFail) return;
   tiltFail = true; TILT.gx = TILT.gy = 0;
@@ -711,10 +718,9 @@ function failTilt() {
 /* Eğimden hız: yön = eğim yönü, hız = eğim miktarı (ölü bölgeden tam eğime kadar yumuşak artış) */
 function tiltStep() {
   TILT.gx = TILT.gy = 0;
-  if (!tiltLive() || !TILT.has) return [0, 0];
-  const D = 180 / Math.PI, u = TILT.up; let tx, ty;
-  if (S.tiltRef === 'start' && TILT.n) { const c = tiltAngles(u), n = TILT.n; tx = wrapA(c.roll - n.roll) * D; ty = wrapA(c.pitch - n.pitch) * D; }
-  else { tx = Math.asin(clamp(-u[0], -1, 1)) * D; ty = -Math.asin(clamp(u[1], -1, 1)) * D; }   /* mutlak: telefon yatay (ekran yukarı) = 0 */
+  if (!tiltLive() || !TILT.n) return [0, 0];
+  const c = tiltAngles(TILT.up), n = { roll: 0, pitch: 0 }, D = 180 / Math.PI;
+  const tx = wrapA(c.roll - n.roll) * D, ty = wrapA(c.pitch - n.pitch) * D;
   const mag = Math.hypot(tx, ty), full = TILT_FULL / clamp(S.sens, .4, 2);
   if (mag < TILT_DEAD) return [0, 0];
   const k = clamp((mag - TILT_DEAD) / (full - TILT_DEAD), 0, 1), f = Math.pow(k, 1.05);
@@ -727,36 +733,120 @@ function tiltStep() {
 /* ---------- Yerel metin yardımcısı (TR / EN) ---------- */
 const isTR = () => String(S.lang || document.documentElement.lang || navigator.language || 'tr').slice(0, 2) === 'tr';
 const tx = (tr, en) => isTR() ? tr : en;
+const LK = () => { const i = ['tr', 'en', 'es', 'de'].indexOf(S.lang); return i < 0 ? 1 : i; };
 
-/* ---------- CrazyGames SDK v3 ---------- */
-const CG = { ok: false, playing: false, busy: false, runs: 0 };
+/* ---------- CrazyGames SDK v3 ----------
+   init · game (loadingStart/Stop, gameplayStart/Stop, happytime) · ad (midgame, rewarded) ·
+   banner (duyarlı) · data (bulut kaydı) · user (dil) · game.settings (ses kısma) */
+const CG = { ok: false, env: 'local', playing: false, busy: false, runs: 0, lastAd: 0, loading: false, loaded: false, banner: false, forceMute: false, adMute: false };
+const AD_COINS = 150;
 const cgS = () => window.CrazyGames && window.CrazyGames.SDK;
+const realAds = () => CG.ok && CG.env !== 'disabled';   /* gerçek CrazyGames reklamı var mı */
+const adsOn = () => true;                                /* reklam butonları her zaman görünür */
 async function cgInit() {
-  try { if (cgS()) { await cgS().init(); CG.ok = true; cgS().game.loadingStart(); try { CG.adblock = !!(await cgS().ad.hasAdblock()); } catch (e) { CG.adblock = false; } } } catch (e) { CG.ok = false; }
+  const sdk = cgS(); if (!sdk) return;
+  try {
+    await sdk.init(); CG.ok = true; CG.env = sdk.environment || 'crazygames';
+    try { sdk.game.loadingStart(); CG.loading = true; if (CG.loaded) cgLoaded(); } catch (e) { /* yok say */ }
+    cgSettings(); cgLang(); cgLoadData();
+  } catch (e) { CG.ok = false; }
 }
-function cgLoaded() { if (CG.ok) try { cgS().game.loadingStop(); } catch (e) { /* yok say */ } }
+function cgLoaded() {
+  CG.loaded = true;
+  if (CG.ok && CG.loading) { CG.loading = false; try { cgS().game.loadingStop(); } catch (e) { /* yok say */ } }
+}
+function cgSettings() {
+  try {
+    const g = cgS().game, s = g.settings;
+    if (s && s.muteAudio) { CG.forceMute = true; setVolumes(); }
+    if (g.addSettingsChangeListener) g.addSettingsChangeListener(ns => { CG.forceMute = !!(ns && ns.muteAudio); setVolumes(); });
+  } catch (e) { /* yok say */ }
+}
+function cgLang() {
+  try {
+    const loc = String(cgS().user.systemInfo.locale || '').slice(0, 2).toLowerCase();
+    if (!S.langSet && L[loc] && loc !== S.lang) { S.lang = loc; applyLang(); renderSettings(); menuStats(); }
+  } catch (e) { /* yok say */ }
+}
+function cgLoadData() {
+  try {
+    const d = cgS().data; if (!d) return;
+    const raw = d.getItem(SAVE_KEY);
+    if (!raw) { cgSaveData(); return; }
+    const o = JSON.parse(raw);
+    if ((o.ts || 0) > (S.ts || 0)) {
+      S = Object.assign(S, o); S.up = Object.assign({}, DEF.up, o.up); S.st = Object.assign({}, DEF.st, o.st); S.ach = o.ach || {};
+      if (!L[S.lang]) S.lang = 'en';
+      if (S.ctrl !== 'tilt' && S.ctrl !== 'touch') S.ctrl = 'tilt';
+      S.sens = clamp(+S.sens || 1, .5, 1.6); muted = !!S.muted; setVolumes();
+      try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* yok say */ }
+      applyLang(); setMap(); menuStats(); renderSettings();
+    } else cgSaveData();
+  } catch (e) { /* yok say */ }
+}
+function cgSaveData() {
+  if (!CG.ok) return;
+  clearTimeout(CG.saveT);
+  CG.saveT = setTimeout(() => { try { cgS().data.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* yok say */ } }, 500);
+}
 function cgPlay(on) {
   if (!CG.ok || CG.playing === on) return; CG.playing = on;
   try { on ? cgS().game.gameplayStart() : cgS().game.gameplayStop(); } catch (e) { /* yok say */ }
 }
 function cgHappy() { if (CG.ok) try { cgS().game.happytime(); } catch (e) { /* yok say */ } }
-/* reklam: ses kapanır, oyun durur; bitince / hata verince done(başarılı_mı) çağrılır */
+/* Reklam: oyun durur, ses kapanır; bitince ya da hata verince done(başarılı_mı) çağrılır */
 function cgAd(type, done) {
-  if (!CG.ok || CG.busy) { done(false); return; }
+  if (CG.busy) { done(false); return; }
+  if (!realAds()) { if (type === 'rewarded') demoAd(done); else done(false); return; }
   CG.busy = true; cgPlay(false);
-  const was = muted; let fin = false;
-  const end = ok => { if (fin) return; fin = true; CG.busy = false; CG.lastAd = performance.now(); muted = was; setVolumes(); last = performance.now(); done(ok); };
+  let fin = false;
+  const end = ok => {
+    if (fin) return; fin = true; CG.busy = false; CG.adMute = false; setVolumes();
+    CG.lastAd = performance.now(); last = performance.now(); done(ok);
+  };
   try {
     cgS().ad.requestAd(type, {
-      adStarted: () => { muted = true; setVolumes(); },
+      adStarted: () => { CG.adMute = true; setVolumes(); },
       adFinished: () => end(true),
       adError: () => end(false)
     });
   } catch (e) { end(false); }
 }
+/* Duyarlı banner: yalnızca oyun sonu ekranında, yeterli yükseklik varsa */
+async function cgBanner(on) {
+  const el = $('cgBanner'); if (!el) return;
+  if (!on) {
+    if (CG.banner) { CG.banner = false; try { cgS().banner.clearBanner('cgBanner'); } catch (e) { /* yok say */ } el.style.display = 'none'; }
+    return;
+  }
+  if (!realAds() || CG.banner || innerHeight < 640) return;
+  CG.banner = true; el.style.display = 'block';
+  try { await cgS().banner.requestResponsiveBanner('cgBanner'); } catch (e) { CG.banner = false; el.style.display = 'none'; }
+}
+/* SDK yokken (yerel test / başka site) ödüllü reklam yerine kısa test reklamı */
+function demoAd(done) {
+  CG.busy = true;
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#02080b;color:#ffd27a;font-weight:800;font-size:22px;text-align:center;padding:20px';
+  let n = 3; const paint = () => { el.innerHTML = '<div>' + t('adTest') + '</div><div style="font-size:64px">' + n + '</div>'; };
+  paint(); document.body.appendChild(el);
+  const iv = setInterval(() => { n--; if (n <= 0) { clearInterval(iv); el.remove(); CG.busy = false; last = performance.now(); done(true); } else paint(); }, 1000);
+}
+function adFailToast() { showToast('phone', 'b-slate', t('adFail'), t('adFailD')); }
 function rewardDouble() {
   $('oAd').style.display = 'none';
-  cgAd('rewarded', ok => { if (ok) { S.coins += earned; sv(); $('oc').textContent = t('earned') + ': +' + earned * 2; menuStats(); SFX.gem(); } else $('oAd').style.display = ''; });
+  cgAd('rewarded', ok => {
+    if (ok) { S.coins += earned; sv(); $('oc').textContent = t('earned') + ': +' + earned * 2; menuStats(); SFX.gem(); }
+    else { $('oAd').style.display = ''; adFailToast(); }
+  });
+}
+function rewardCoins() {
+  $('shopAd').style.display = 'none';
+  cgAd('rewarded', ok => {
+    if (ok) { S.coins += AD_COINS; sv(); menuStats(); SFX.buy(); showToast('coin', 'b-gold', t('adCoinsDone', AD_COINS), ''); }
+    else adFailToast();
+    if (curScreen === 'shop') $('shopAd').style.display = adsOn() ? '' : 'none';
+  });
 }
 
 /* ---------- Dikey kilit: ekran dönerse oyun donar, geri dönünce kaldığı yerden devam ---------- */
@@ -764,7 +854,7 @@ let ROT = false;
 function lockPortrait() { try { const o = screen.orientation; if (o && o.lock) o.lock('portrait').catch(() => { /* destek yok */ }); } catch (e) { /* destek yok */ } }
 function rotGuard() {
   ROT = TOUCHDEV && innerWidth > innerHeight * 1.1 && Math.min(screen.width, screen.height) < 700;
-  $('rotT').textContent = t('rot');
+  $('rotT').textContent = t('rotate');
   $('rot').classList.toggle('on', ROT);
   if (ROT && (st === 'play' || st === 'count')) pauseT();
   return ROT;
@@ -773,27 +863,30 @@ function rotGuard() {
 /* ---------- Yükseltme seçimi ("Pakt"): her seviye atlayışında 3 karttan biri ---------- */
 let B = { spd: 1, life: 1, coin: 0, cw: 0, mg: 0, sc: 1, lag: 0 };
 const BOONS = [
-  { g: '⚡', c: '#7fe9ff', n: ['Hafif Ayak', 'Light Feet'], d: ['%12 daha hızlı hareket', '12% faster movement'], f: () => B.spd *= 1.12 },
-  { g: '⏳', c: '#ffd27a', n: ['Uzun Parıltı', 'Lingering Glow'], d: ['Kristaller %25 daha uzun kalır', 'Shards last 25% longer'], f: () => B.life *= 1.25 },
-  { g: '◎', c: '#7dffc8', n: ['Çekim', 'Pull'], d: ['Toplama menzili +14', 'Pickup range +14'], f: () => B.mg += 14 },
-  { g: '✦', c: '#ff9ad5', n: ['Akış', 'Flow'], d: ['Kombo süresi +1.2 sn', 'Combo timer +1.2s'], f: () => B.cw += 1.2 },
-  { g: '◆', c: '#7dffc8', n: ['Açgözlü', 'Greedy'], d: ['Kazanılan jeton +%30', 'Coins earned +30%'], f: () => B.coin += .3 },
-  { g: '★', c: '#ffb02e', n: ['Altın Dokunuş', 'Golden Touch'], d: ['Puanlar +%25', 'Score +25%'], f: () => B.sc *= 1.25 },
-  { g: '⛨', c: '#9ff0ff', n: ['Kalkan Işıltısı', 'Aegis Spark'], d: ['Hemen bir kalkan kazan', 'Gain a shield now'], ok: () => !shield, f: () => { shield = true; } },
-  { g: '✺', c: '#c9a8ff', n: ['Yankı Süpürme', 'Echo Purge'], d: ['Tüm yankıları sil', 'Wipe all echoes'], ok: () => ghosts.length >= 2, f: () => clearGhosts(true) },
-  { g: '◌', c: '#9cc0ff', n: ['Geç Gölge', 'Late Shadow'], d: ['Yeni yankılar 0.4 sn daha geriden gelir', 'New echoes trail 0.4s further'], f: () => B.lag += .4 }
+  { g: '⚡', c: '#7fe9ff', n: ['Hafif Ayak', 'Light Feet', 'Pies ligeros', 'Leichte Füße'], d: ['%12 daha hızlı hareket', '12% faster movement', '12 % más de velocidad', '12 % schnellere Bewegung'], f: () => B.spd *= 1.12 },
+  { g: '⏳', c: '#ffd27a', n: ['Uzun Parıltı', 'Lingering Glow', 'Brillo duradero', 'Langes Glimmen'], d: ['Kristaller %25 daha uzun kalır', 'Shards last 25% longer', 'Los cristales duran un 25 % más', 'Kristalle halten 25 % länger'], f: () => B.life *= 1.25 },
+  { g: '◎', c: '#7dffc8', n: ['Çekim', 'Pull', 'Atracción', 'Sog'], d: ['Toplama menzili +14', 'Pickup range +14', 'Alcance de recogida +14', 'Sammelreichweite +14'], f: () => B.mg += 14 },
+  { g: '✦', c: '#ff9ad5', n: ['Akış', 'Flow', 'Fluidez', 'Fluss'], d: ['Kombo süresi +1.2 sn', 'Combo timer +1.2s', 'Tiempo de combo +1,2 s', 'Kombo-Zeit +1,2 s'], f: () => B.cw += 1.2 },
+  { g: '◆', c: '#7dffc8', n: ['Açgözlü', 'Greedy', 'Codicioso', 'Gierig'], d: ['Kazanılan jeton +%30', 'Coins earned +30%', 'Monedas ganadas +30 %', 'Verdiente Münzen +30 %'], f: () => B.coin += .3 },
+  { g: '★', c: '#ffb02e', n: ['Altın Dokunuş', 'Golden Touch', 'Toque dorado', 'Goldene Hand'], d: ['Puanlar +%25', 'Score +25%', 'Puntos +25 %', 'Punkte +25 %'], f: () => B.sc *= 1.25 },
+  { g: '⛨', c: '#9ff0ff', n: ['Kalkan Işıltısı', 'Aegis Spark', 'Chispa de égida', 'Schildfunke'], d: ['Hemen bir kalkan kazan', 'Gain a shield now', 'Gana un escudo ahora', 'Erhalte sofort einen Schild'], ok: () => !shield, f: () => { shield = true; } },
+  { g: '✺', c: '#c9a8ff', n: ['Yankı Süpürme', 'Echo Purge', 'Purga de ecos', 'Echo-Reinigung'], d: ['Tüm yankıları sil', 'Wipe all echoes', 'Elimina todos los ecos', 'Alle Echos löschen'], ok: () => ghosts.length >= 2, f: () => clearGhosts(true) },
+  { g: '◌', c: '#9cc0ff', n: ['Geç Gölge', 'Late Shadow', 'Sombra tardía', 'Späte Schatten'], d: ['Yeni yankılar 0.4 sn daha geriden gelir', 'New echoes trail 0.4s further', 'Los nuevos ecos se retrasan 0,4 s', 'Neue Echos folgen 0,4 s später'], f: () => B.lag += .4 }
 ];
-function offerBoons() {
+function offerBoons(again) {
   st = 'boon'; cgPlay(false);
   const list = BOONS.filter(b => !b.ok || b.ok()).sort(() => Math.random() - .5).slice(0, 3);
-  const el = $('boon'), k = isTR() ? 0 : 1;
+  const el = $('boon'), k = LK();
   el.innerHTML = `<h2>${t('boonT')}</h2>` + list.map((b, i) =>
-    `<button class="bc" style="--c:${b.c};--n:${i}" data-i="${BOONS.indexOf(b)}"><em>${b.g}</em><div><b>${t('b' + BOONS.indexOf(b) + 'n')}</b><span>${t('b' + BOONS.indexOf(b) + 'd')}</span></div></button>`).join('');
+    `<button class="bc" style="--c:${b.c};--n:${i}" data-i="${BOONS.indexOf(b)}"><em>${b.g}</em><div><b>${b.n[k]}</b><span>${b.d[k]}</span></div></button>`).join('') +
+    (adsOn() && !again ? `<button class="rr" id="rr">${ico('redo')}<span>${t('adReroll')}</span></button>` : '');
   el.querySelectorAll('.bc').forEach(btn => btn.onclick = () => {
     const b = BOONS[+btn.dataset.i]; b.f(); el.classList.remove('on');
     ring(P.x, P.y, '255,210,120', 500, .7, 3); burst(P.x, P.y, b.c, 22, 300, 'st'); SFX.gem(); vib(20);
-    st = 'play'; cgPlay(true); last = performance.now(); updateHud();
+    st = 'play'; last = performance.now(); updateHud(); cgPlay(true);
   });
+  const rr = $('rr');
+  if (rr) rr.onclick = () => { rr.disabled = true; cgAd('rewarded', ok => { if (ok) offerBoons(true); else { rr.disabled = false; adFailToast(); } }); };
   setTimeout(() => { if (st === 'boon') el.classList.add('on'); }, 650);
 }
 
@@ -813,7 +906,21 @@ function giveXp(x) {
 /* ---------- Diller ---------- */
 const L = {
   tr: {
-    n: 'Türkçe', tag: 'Geçmişin seni kovalıyor', tap: 'Başlamak için dokun',
+    n: 'Türkçe',
+    adTest: 'Test reklamı (gerçek reklam CrazyGames üzerinde çıkar)',
+    newRank: 'Yeni rütbe: ',
+    rankUp: 'Rütbe atladın!',
+    rank: 'Rütbe',
+    oSurge: 'Aşırı Yük x2',
+    oChrono: 'Zaman Durdu',
+    rotate: 'Telefonu dikey tut',
+    adFailD: 'Biraz sonra tekrar dene.',
+    adFail: 'Reklam şu an yok',
+    adCoinsDone: '+{0} jeton kazandın!',
+    adCoins: 'Reklam izle: +{0} jeton',
+    adDouble: 'Reklam izle: jetonlar x2',
+    adReroll: 'Reklam izle: yeniden çek',
+    boonT: 'Bir güç seç', tag: 'Geçmişin seni kovalıyor', tap: 'Başlamak için dokun',
     play: 'Oyna', shop: 'Mağaza', maps: 'Haritalar', board: 'Rekorlar', set: 'Ayarlar', help: 'Nasıl oynanır',
     back: 'Geri', again: 'Bir kez daha', restart: 'Baştan başla', menu: 'Ana menü',
     tabSkin: 'Kostümler', tabUp: 'Yükseltmeler', tabScore: 'Skorlar', tabAch: 'Başarımlar',
@@ -842,21 +949,35 @@ const L = {
     a5n: 'Şık', a5d: '4 kostüme sahip ol',
     a6n: 'Kusursuz', a6d: 'Bir seviyeyi hiç kristal kaçırmadan bitir',
     a7n: 'Son Viraj', a7d: '5. seviyeye ulaş',
-    h1t: 'Kontrol', h1d: 'Telefonu dikey ya da yatay tut ve eğ: karakter eğdiğin yöne gider, ne kadar eğersen o kadar hızlıdır. Ayarlardan dokunmatik kontrole geçebilirsin. Klavyede ok tuşları ya da WASD, duraklatmak için P.',
+    h1t: 'Kontrol', h1d: 'Telefonu yatay (ekran yukarı) tutarak başla: düz durunca karakter durur, eğdiğin yöne gider ve ne kadar eğersen o kadar hızlanır. Ayarlardan dokunmatik kontrole geçebilirsin. Klavyede ok tuşları ya da WASD, duraklatmak için P.',
     sound: 'Ses', ctrl: 'Kontrol', cTilt: 'Eğerek', cTiltS: 'Telefonu eğ', cTouch: 'Dokunarak', cTouchS: 'Parmağınla sürükle', sens: 'Hassasiyet',
-    calHint: 'Devam edince telefonun o anki duruşu merkez olur.',
-    ciT: 'Telefonu eğerek oyna', ciD: 'Telefonu dikey ya da yatay tut. Hangi yöne eğersen karakter o yöne gider.',
-    ciD2: 'Ne kadar eğersen o kadar hızlı gider, az eğersen yavaşça süzülür. Rahat tuttuğun duruş merkez sayılır.',
+    calHint: 'Telefon yatayken (ekran yukarı) merkezdir; eğdiğin yöne gider.',
+    ciT: 'Telefonu eğerek oyna', ciD: 'Telefon yatay durunca karakter durur. Hangi yöne eğersen karakter o yöne kayar.',
+    ciD2: 'Ne kadar eğersen o kadar hızlı gider. Başlarken telefonu düz tutman en iyisi.',
     ciTilt: 'Eğerek oyna', ciTouch: 'Dokunarak oyna', ciNote: 'Bunu istediğin zaman Ayarlar’dan değiştirebilirsin.',
     tiltOff: 'Eğim kullanılamıyor', tiltOffD: 'Sensör bulunamadı ya da izin verilmedi. Dokunmatiğe geçildi.',
-    cTipTilt: 'Telefonu eğ: yön eğime, hız eğim miktarına bağlı.', cTipTouch: 'Parmağını sürükle, karakter seni takip eder.',
+    cTipTilt: 'Telefonu düz tut: durur. Eğdiğin yöne gider, eğim arttıkça hızlanır.', cTipTouch: 'Parmağını sürükle, karakter seni takip eder.',
     h2t: 'Yankılar', h2d: 'Her kristal, rotanı tekrar eden bir yankı doğurur. Dokunursan oyun biter. Soluk çizgi yankıların yoludur.',
-    h3t: 'Kombo', h3d: 'Kristalleri hızlı topla, kombo x8 e kadar çıkar. Yankının yanından değmeden geçersen bonus puan kazanırsın.',
+    h3t: 'Kombo', h3d: 'Kristalleri hızlı topla, kombo x8 e kadar çıkar. Yankının yanından değmeden geçersen +100 puan ve +10 jeton kazanırsın.',
     h4t: 'Seviyeler', h4d: 'Her seviyede 10 kristal topla. Seviye atlayınca tüm yankılar silinir. 5 seviyeyi bitirirsen kazanırsın.',
     h5t: 'Bonus küreler', h5d: 'Mor Nova yankıları siler, mavi Kalkan bir hatayı affeder, yeşil Mücevher jeton verir.'
   },
   en: {
-    n: 'English', tag: 'Your past is chasing you', tap: 'Tap to start',
+    n: 'English',
+    adTest: 'Test ad (real ads show on CrazyGames)',
+    newRank: 'New rank: ',
+    rankUp: 'Rank up!',
+    rank: 'Rank',
+    oSurge: 'Overdrive x2',
+    oChrono: 'Time Freeze',
+    rotate: 'Please rotate your phone upright',
+    adFailD: 'Try again in a moment.',
+    adFail: 'No ad available',
+    adCoinsDone: 'You got +{0} coins!',
+    adCoins: 'Watch ad: +{0} coins',
+    adDouble: 'Watch ad: double coins',
+    adReroll: 'Watch ad: reroll',
+    boonT: 'Choose a boon', tag: 'Your past is chasing you', tap: 'Tap to start',
     play: 'Play', shop: 'Shop', maps: 'Maps', board: 'Records', set: 'Settings', help: 'How to play',
     back: 'Back', again: 'One more try', restart: 'Restart', menu: 'Main menu',
     tabSkin: 'Outfits', tabUp: 'Upgrades', tabScore: 'Scores', tabAch: 'Achievements',
@@ -885,21 +1006,35 @@ const L = {
     a5n: 'Stylish', a5d: 'Own 4 outfits',
     a6n: 'Flawless', a6d: 'Finish a level without missing a crystal',
     a7n: 'Final Stretch', a7d: 'Reach level 5',
-    h1t: 'Controls', h1d: 'Hold your phone upright or sideways and tilt it: the character goes where you tilt, faster the more you tilt. Switch to touch in Settings. On keyboard use arrows or WASD, P to pause.',
+    h1t: 'Controls', h1d: 'Start with your phone flat (screen up): level means still, tilting moves the character that way and the more you tilt the faster it goes. Switch to touch in Settings. On keyboard use arrows or WASD, P to pause.',
     sound: 'Sound', ctrl: 'Controls', cTilt: 'Tilt', cTiltS: 'Tilt your phone', cTouch: 'Touch', cTouchS: 'Drag with finger', sens: 'Sensitivity',
-    calHint: 'When you resume, your current phone angle becomes the center.',
-    ciT: 'Play by tilting', ciD: 'Hold your phone upright or sideways. Whichever way you tilt, the character moves that way.',
-    ciD2: 'Tilt more to go faster, less to glide slowly. The pose you hold comfortably is the center.',
+    calHint: 'Flat (screen up) is the center; the character goes where you tilt.',
+    ciT: 'Play by tilting', ciD: 'Keep the phone flat and the character stays still. Tilt it any direction and the character slides that way.',
+    ciD2: 'Tilt more to go faster. Starting with the phone flat works best.',
     ciTilt: 'Play with tilt', ciTouch: 'Play with touch', ciNote: 'You can change this anytime in Settings.',
     tiltOff: 'Tilt unavailable', tiltOffD: 'No sensor found or permission denied. Switched to touch.',
-    cTipTilt: 'Tilt your phone: direction follows the tilt, speed follows the angle.', cTipTouch: 'Drag your finger and the character follows.',
+    cTipTilt: 'Keep the phone flat to stop. Tilt to move; more tilt, more speed.', cTipTouch: 'Drag your finger and the character follows.',
     h2t: 'Echoes', h2d: 'Each crystal spawns an echo that replays your route. Touch one and the run ends. The faint line shows their path.',
-    h3t: 'Combo', h3d: 'Collect fast to build a combo up to x8. Slipping past an echo without touching it earns bonus points.',
+    h3t: 'Combo', h3d: 'Collect fast to build a combo up to x8. Slipping past an echo without touching it earns +100 points and +10 coins.',
     h4t: 'Levels', h4d: 'Collect 10 crystals per level. Leveling up wipes every echo. Finish 5 levels to win.',
     h5t: 'Bonus orbs', h5d: 'Violet Nova wipes echoes, blue Shield forgives a hit, green Gem gives coins.'
   },
   es: {
-    n: 'Español', tag: 'Tu pasado te persigue', tap: 'Toca para empezar',
+    n: 'Español',
+    adTest: 'Anuncio de prueba (los reales salen en CrazyGames)',
+    newRank: 'Nuevo rango: ',
+    rankUp: '¡Subiste de rango!',
+    rank: 'Rango',
+    oSurge: 'Sobrecarga x2',
+    oChrono: 'Tiempo detenido',
+    rotate: 'Gira el móvil a vertical',
+    adFailD: 'Inténtalo de nuevo en un momento.',
+    adFail: 'No hay anuncio ahora',
+    adCoinsDone: '¡Ganaste +{0} monedas!',
+    adCoins: 'Ver anuncio: +{0} monedas',
+    adDouble: 'Ver anuncio: monedas x2',
+    adReroll: 'Ver anuncio: otras opciones',
+    boonT: 'Elige un poder', tag: 'Tu pasado te persigue', tap: 'Toca para empezar',
     play: 'Jugar', shop: 'Tienda', maps: 'Mapas', board: 'Récords', set: 'Ajustes', help: 'Cómo jugar',
     back: 'Volver', again: 'Una vez más', restart: 'Reiniciar', menu: 'Menú principal',
     tabSkin: 'Trajes', tabUp: 'Mejoras', tabScore: 'Puntuaciones', tabAch: 'Logros',
@@ -928,21 +1063,35 @@ const L = {
     a5n: 'Con estilo', a5d: 'Consigue 4 trajes',
     a6n: 'Impecable', a6d: 'Termina un nivel sin perder ningún cristal',
     a7n: 'Última curva', a7d: 'Llega al nivel 5',
-    h1t: 'Control', h1d: 'Sujeta el móvil en vertical u horizontal e inclínalo: el personaje va hacia donde inclines, más rápido cuanto más inclines. Cambia a táctil en Ajustes. En teclado usa flechas o WASD; P para pausar.',
+    h1t: 'Control', h1d: 'Empieza con el móvil plano (pantalla hacia arriba): nivelado, el personaje se detiene; al inclinarlo se mueve hacia ese lado y más rápido cuanto más lo inclines. Cambia a táctil en Ajustes. En teclado usa flechas o WASD; P para pausar.',
     sound: 'Sonido', ctrl: 'Control', cTilt: 'Inclinar', cTiltS: 'Inclina el móvil', cTouch: 'Táctil', cTouchS: 'Arrastra con el dedo', sens: 'Sensibilidad',
-    calHint: 'Al continuar, el ángulo actual del móvil será el centro.',
-    ciT: 'Juega inclinando', ciD: 'Sujeta el móvil en vertical u horizontal. Hacia donde lo inclines, el personaje se moverá.',
-    ciD2: 'Más inclinación, más velocidad; poca inclinación, avanza despacio. Tu postura cómoda es el centro.',
+    calHint: 'El móvil plano (pantalla arriba) es el centro; el personaje va hacia donde inclines.',
+    ciT: 'Juega inclinando', ciD: 'Con el móvil plano el personaje se queda quieto. Inclínalo hacia cualquier lado y se deslizará hacia allí.',
+    ciD2: 'Más inclinación, más velocidad. Lo mejor es empezar con el móvil plano.',
     ciTilt: 'Jugar inclinando', ciTouch: 'Jugar con toque', ciNote: 'Puedes cambiarlo cuando quieras en Ajustes.',
     tiltOff: 'Inclinación no disponible', tiltOffD: 'No hay sensor o se denegó el permiso. Se cambió a táctil.',
-    cTipTilt: 'Inclina el móvil: la dirección sigue la inclinación y la velocidad el ángulo.', cTipTouch: 'Arrastra el dedo y el personaje te sigue.',
+    cTipTilt: 'Móvil plano = parado. Inclina para moverte; más inclinación, más velocidad.', cTipTouch: 'Arrastra el dedo y el personaje te sigue.',
     h2t: 'Ecos', h2d: 'Cada cristal crea un eco que repite tu ruta. Si lo tocas, pierdes. La línea tenue marca su camino.',
-    h3t: 'Combo', h3d: 'Recoge rápido para subir el combo hasta x8. Pasar rozando un eco da puntos extra.',
+    h3t: 'Combo', h3d: 'Recoge rápido para subir el combo hasta x8. Pasar rozando un eco sin tocarlo da +100 puntos y +10 monedas.',
     h4t: 'Niveles', h4d: 'Recoge 10 cristales por nivel. Al subir de nivel desaparecen todos los ecos. Completa 5 niveles para ganar.',
     h5t: 'Orbes bonus', h5d: 'La Nova violeta borra los ecos, el Escudo azul perdona un golpe y la Gema verde da monedas.'
   },
   de: {
-    n: 'Deutsch', tag: 'Deine Vergangenheit jagt dich', tap: 'Tippen zum Starten',
+    n: 'Deutsch',
+    adTest: 'Testanzeige (echte Werbung erscheint auf CrazyGames)',
+    newRank: 'Neuer Rang: ',
+    rankUp: 'Rang aufgestiegen!',
+    rank: 'Rang',
+    oSurge: 'Überlast x2',
+    oChrono: 'Zeitstopp',
+    rotate: 'Bitte Handy hochkant halten',
+    adFailD: 'Versuch es gleich noch einmal.',
+    adFail: 'Keine Werbung verfügbar',
+    adCoinsDone: 'Du erhältst +{0} Münzen!',
+    adCoins: 'Werbung ansehen: +{0} Münzen',
+    adDouble: 'Werbung ansehen: Münzen x2',
+    adReroll: 'Werbung ansehen: neu mischen',
+    boonT: 'Wähle eine Kraft', tag: 'Deine Vergangenheit jagt dich', tap: 'Tippen zum Starten',
     play: 'Spielen', shop: 'Shop', maps: 'Karten', board: 'Rekorde', set: 'Einstellungen', help: 'Anleitung',
     back: 'Zurück', again: 'Noch einmal', restart: 'Neustart', menu: 'Hauptmenü',
     tabSkin: 'Outfits', tabUp: 'Upgrades', tabScore: 'Punkte', tabAch: 'Erfolge',
@@ -971,22 +1120,20 @@ const L = {
     a5n: 'Stilvoll', a5d: 'Besitze 4 Outfits',
     a6n: 'Makellos', a6d: 'Beende ein Level ohne verpassten Kristall',
     a7n: 'Letzte Kurve', a7d: 'Erreiche Level 5',
-    h1t: 'Steuerung', h1d: 'Halte dein Handy hochkant oder quer und neige es: Die Figur bewegt sich dorthin, wohin du neigst, und wird schneller, je stärker du neigst. In den Einstellungen kannst du auf Touch wechseln. Tastatur: Pfeile oder WASD, P für Pause.',
+    h1t: 'Steuerung', h1d: 'Starte mit flach gehaltenem Handy (Display nach oben): Waagerecht steht die Figur still, beim Neigen bewegt sie sich in diese Richtung, und je stärker du neigst, desto schneller wird sie. In den Einstellungen kannst du auf Touch wechseln. Tastatur: Pfeile oder WASD, P für Pause.',
     sound: 'Ton', ctrl: 'Steuerung', cTilt: 'Neigen', cTiltS: 'Handy neigen', cTouch: 'Touch', cTouchS: 'Mit dem Finger ziehen', sens: 'Empfindlichkeit',
-    calHint: 'Beim Fortsetzen wird die aktuelle Handyhaltung zur Mitte.',
-    ciT: 'Spiele durch Neigen', ciD: 'Halte dein Handy hochkant oder quer. In welche Richtung du neigst, dorthin bewegt sich die Figur.',
-    ciD2: 'Je stärker du neigst, desto schneller; leicht geneigt gleitet sie langsam. Deine bequeme Haltung ist die Mitte.',
+    calHint: 'Flach (Display nach oben) ist die Mitte; die Figur bewegt sich in Neigungsrichtung.',
+    ciT: 'Spiele durch Neigen', ciD: 'Hältst du das Handy flach, bleibt die Figur stehen. Neige es in eine Richtung, und sie gleitet dorthin.',
+    ciD2: 'Je stärker du neigst, desto schneller. Am besten startest du mit flachem Handy.',
     ciTilt: 'Mit Neigung spielen', ciTouch: 'Mit Touch spielen', ciNote: 'Du kannst das jederzeit in den Einstellungen ändern.',
     tiltOff: 'Neigung nicht verfügbar', tiltOffD: 'Kein Sensor oder Zugriff verweigert. Auf Touch umgestellt.',
-    cTipTilt: 'Handy neigen: Richtung folgt der Neigung, Tempo dem Winkel.', cTipTouch: 'Zieh den Finger, die Figur folgt dir.',
+    cTipTilt: 'Handy flach = Stillstand. Neigen bewegt, mehr Neigung = mehr Tempo.', cTipTouch: 'Zieh den Finger, die Figur folgt dir.',
     h2t: 'Echos', h2d: 'Jeder Kristall erzeugt ein Echo, das deine Route wiederholt. Berührung beendet das Spiel. Die helle Linie zeigt den Weg.',
-    h3t: 'Kombo', h3d: 'Sammle schnell für Kombo bis x8. Knappes Vorbeiziehen an Echos gibt Bonuspunkte.',
+    h3t: 'Kombo', h3d: 'Sammle schnell für Kombo bis x8. Knappes Vorbeiziehen an Echos ohne Berührung gibt +100 Punkte und +10 Münzen.',
     h4t: 'Level', h4d: 'Sammle 10 Kristalle pro Level. Beim Levelaufstieg verschwinden alle Echos. Schaffe 5 Level zum Sieg.',
     h5t: 'Bonus-Kugeln', h5d: 'Violette Nova löscht Echos, blaues Schild verzeiht einen Treffer, grünes Juwel gibt Münzen.'
   }
 };
-const TB = {"tr": {"b": ["Hafif Ayak|%12 daha hızlı hareket", "Uzun Parıltı|Kristaller %25 daha uzun kalır", "Çekim|Toplama menzili +14", "Akış|Kombo süresi +1.2 sn", "Açgözlü|Kazanılan jeton +%30", "Altın Dokunuş|Puanlar +%25", "Kalkan Işıltısı|Hemen bir kalkan kazan", "Yankı Süpürme|Tüm yankıları sil", "Geç Gölge|Yeni yankılar 0.4 sn daha geriden gelir"], "boonT": "Bir güç seç", "rot": "Telefonu dikey tut", "freeze": "Zaman Durdu", "over2": "Aşırı Yük x2", "rank": "Rütbe", "rankUp": "Rütbe atladın!", "newRank": "Yeni rütbe: ", "adDouble": "Reklam izle: jetonlar x2", "trFlat": "Yatay = sıfır", "trFlatS": "Düz tutunca durur", "trStart": "Başlangıç duruşu", "trStartS": "İlk duruş merkez olur", "ciD2": "Telefon düz (ekran yukarı) dururken karakter durur. Ne kadar eğersen o kadar hızlı gider.", "calHint": "Devam edince telefonun o anki duruşu merkez olur.", "cTipTilt": "Telefonu düz tut; eğdiğin yöne gider, ne kadar eğersen o kadar hızlı."}, "en": {"b": ["Light Feet|12% faster movement", "Lingering Glow|Shards last 25% longer", "Pull|Pickup range +14", "Flow|Combo timer +1.2s", "Greedy|Coins earned +30%", "Golden Touch|Score +25%", "Aegis Spark|Gain a shield now", "Echo Purge|Wipe all echoes", "Late Shadow|New echoes trail 0.4s further"], "boonT": "Choose a boon", "rot": "Please rotate your phone upright", "freeze": "Time Freeze", "over2": "Overdrive x2", "rank": "Rank", "rankUp": "Rank up!", "newRank": "New rank: ", "adDouble": "Watch ad: double coins", "trFlat": "Flat = zero", "trFlatS": "Still when held flat", "trStart": "Start pose", "trStartS": "First pose is the center", "ciD2": "When the phone lies flat (screen up) the character stays still. Tilt more to go faster.", "calHint": "When you resume, your current phone angle becomes the center.", "cTipTilt": "Hold the phone flat; it moves where you tilt, faster the more you tilt."}, "es": {"b": ["Pies ligeros|12 % más de velocidad", "Brillo duradero|Los cristales duran un 25 % más", "Atracción|Alcance de recogida +14", "Flujo|Tiempo de combo +1,2 s", "Codicioso|Monedas ganadas +30 %", "Toque dorado|Puntos +25 %", "Chispa de égida|Gana un escudo ahora", "Purga de ecos|Elimina todos los ecos", "Sombra tardía|Los nuevos ecos van 0,4 s más atrás"], "boonT": "Elige un poder", "rot": "Gira el móvil a vertical", "freeze": "Tiempo detenido", "over2": "Sobrecarga x2", "rank": "Rango", "rankUp": "¡Subes de rango!", "newRank": "Nuevo rango: ", "adDouble": "Ver anuncio: monedas x2", "trFlat": "Plano = cero", "trFlatS": "Quieto si está plano", "trStart": "Postura inicial", "trStartS": "La primera postura es el centro", "ciD2": "Con el móvil plano (pantalla arriba) el personaje se detiene. Más inclinación, más velocidad.", "calHint": "Al continuar, el ángulo actual del móvil será el centro.", "cTipTilt": "Mantén el móvil plano; va hacia donde inclines, más rápido cuanto más inclines."}, "de": {"b": ["Leichte Füße|12 % schneller", "Langes Leuchten|Kristalle halten 25 % länger", "Sog|Sammelreichweite +14", "Fluss|Kombo-Zeit +1,2 s", "Gierig|Münzen +30 %", "Goldene Hand|Punkte +25 %", "Schildfunke|Erhalte sofort ein Schild", "Echo-Reinigung|Alle Echos löschen", "Späte Schatten|Neue Echos folgen 0,4 s später"], "boonT": "Wähle eine Kraft", "rot": "Handy bitte hochkant halten", "freeze": "Zeit angehalten", "over2": "Überlast x2", "rank": "Rang", "rankUp": "Rang aufgestiegen!", "newRank": "Neuer Rang: ", "adDouble": "Werbung ansehen: Münzen x2", "trFlat": "Flach = null", "trFlatS": "Steht still, wenn flach", "trStart": "Startposition", "trStartS": "Erste Haltung ist die Mitte", "ciD2": "Liegt das Handy flach (Display oben), bleibt die Figur stehen. Je stärker du neigst, desto schneller.", "calHint": "Beim Fortsetzen wird die aktuelle Handyhaltung zur Mitte.", "cTipTilt": "Halte das Handy flach; die Figur folgt deiner Neigung, stärker = schneller."}};
-for (const lg in TB) { const o = TB[lg]; o.b.forEach((q, i) => { const p = q.split('|'); L[lg]['b' + i + 'n'] = p[0]; L[lg]['b' + i + 'd'] = p[1]; }); delete o.b; Object.assign(L[lg], o); }
 const t = (k, ...a) => {
   let s = (L[S.lang] && L[S.lang][k]) || L.en[k] || k;
   a.forEach((v, i) => { s = s.replace('{' + i + '}', v); });
@@ -999,7 +1146,7 @@ const DEF = {
   coins: 0, skins: ['s0'], maps: ['m0'], skin: 's0', map: 'm0',
   up: { u0: 0, u1: 0, u2: 0, u3: 0 },
   music: .6, sfx: .8, shake: 1, haptic: 1, lang: '', muted: 0,
-  ctrl: 'tilt', ctrlSeen: 0, sens: 1, tiltRef: 'flat',
+  ctrl: 'tilt', ctrlSeen: 0, sens: 1,
   sc: [], st: { games: 0, wins: 0, k: 0, near: 0, combo: 1, lv: 1 }, ach: {}
 };
 let S = JSON.parse(JSON.stringify(DEF));
@@ -1042,7 +1189,7 @@ function migrateV1() {
   if (o.lang) S.lang = o.lang;
   S.sc = (o.sc || []).map(r => ({ s: r.s, k: r.k, w: r.w, lv: 1, m: 'm0', d: 0 }));
 }
-const sv = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* depolama kapalı */ } };
+const sv = () => { S.ts = Date.now(); try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* depolama kapalı */ } cgSaveData(); };
 
 function resize() {
   DPR = Math.min(window.devicePixelRatio || 1, 2);
@@ -1057,6 +1204,13 @@ function resize() {
     VIG.width / 2, VIG.height / 2, Math.max(VIG.width, VIG.height) * .75);
   g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.55)');
   v.fillStyle = g; v.fillRect(0, 0, VIG.width, VIG.height);
+  /* film greni + süzülen toz */
+  GRAIN = document.createElement('canvas'); GRAIN.width = GRAIN.height = 128;
+  const gx = GRAIN.getContext('2d'), gi = gx.createImageData(128, 128);
+  for (let i = 0; i < gi.data.length; i += 4) { const v = Math.random() * 255; gi.data[i] = gi.data[i + 1] = gi.data[i + 2] = v; gi.data[i + 3] = 255; }
+  gx.putImageData(gi, 0, 0); GPAT = ctx.createPattern(GRAIN, 'repeat');
+  DUST = Array.from({ length: Math.round(clamp(W * H / 14000, 28, 70)) }, () => ({
+    x: Math.random() * W, y: Math.random() * H, vx: rnd(-6, 8), vy: rnd(-9, -2), r: rnd(.6, 2.2), a: rnd(.12, .42), f: rnd(.5, 1.6), p: Math.random() * TAU }));
   measure();
   P.r = Math.round(9 * clamp(Math.min(W, H) / 700, .9, 1.2));
   P.x = clamp(P.x, 0, W); P.y = clamp(P.y, 0, H);
@@ -1115,7 +1269,7 @@ function setVolumes() {
   const n = ac.currentTime;
   musicBus.gain.setTargetAtTime(S.music * .9, n, .05);
   sfxBus.gain.setTargetAtTime(S.sfx, n, .05);
-  master.gain.setTargetAtTime(muted ? 0 : 1, n, .05);
+  master.gain.setTargetAtTime(muted || CG.forceMute || CG.adMute ? 0 : 1, n, .05);
 }
 /* duraklatınca / ölünce müziği boğuklaştır */
 function musFilter(f) { if (ac) mFilter.frequency.setTargetAtTime(f, ac.currentTime, .15); }
@@ -1207,6 +1361,7 @@ const THEMES = [
     mask: [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0], seq: [4, 3, 2, 0, 2, 3, 4, 5, 4, 2, 3, 2, 0, 1, 2, 4], bell: .25
   }
 ];
+const HOOKS = [[4, 2, 3, 1], [5, 7, 6, 4], [2, 4, 2, 5], [3, 2, 0, 4], [7, 5, 6, 9], [4, 5, 2, 3]];
 function setTheme() { curTheme = clamp(mapIdx(), 0, THEMES.length - 1); mStep = 0; melI = 0; }
 
 /* Müzik yoğunluğu */
@@ -1231,7 +1386,7 @@ function musicTick() {
   }
 }
 function playStep(th, n, t, sd) {
-  const cy = ((n / 64) | 0) % 4, s = n % 16, b = ((n / 16) | 0) % 4, root = th.roots[b], ch = th.ch[b], I = musicIntensity(), bus = musicBus;
+  const s = n % 16, b = ((n / 16) | 0) % 4, root = th.roots[b], ch = th.ch[b], I = musicIntensity(), bus = musicBus;
   /* pad: akor başında nefes alan katman */
   if (s === 0) {
     ch.slice(0, 3).forEach((iv, k) => {
@@ -1253,9 +1408,6 @@ function playStep(th, n, t, sd) {
     const idx = th.arp[(s / 2) % th.arp.length], iv = ch[idx % 4] + 12 * ((idx / 4) | 0);
     voice({ t, f: mf(root + 12 + iv), type: th.arpType, dur: sd * 2.4, vol: .026 + .012 * I, bus, lp: 2600, rev: .35, echo: .3 });
   }
-  /* özgünlük: her 4 ölçüde değişen üst parıltı ve döngü sonu yükselişi */
-  if (s % 4 === 3 && cy % 2) voice({ t, f: mf(root + 24 + ch[(s >> 2) % 4]), type: 'sine', dur: sd * 3, vol: .02, bus, rev: .8, echo: .5 });
-  if (b === 3 && s === 8 && cy === 3) hit({ t, f: 600, sweep: 6000, type: 'bandpass', q: 2, dur: sd * 8, vol: .03, bus, rev: .6 });
   /* davul */
   const dm = th.drum;
   if (dm === 'four') {
@@ -1279,9 +1431,20 @@ function playStep(th, n, t, sd) {
   }
   /* lead melodi */
   if (I >= 2 && th.mask[s]) {
-    const idx = th.seq[melI % th.seq.length] + [0, 0, 2, 1][cy]; melI++;
+    const idx = th.seq[melI % th.seq.length]; melI++;
     voice({ t, f: mf(th.key + 24 + th.scale[idx % 5] + 12 * ((idx / 5) | 0)), type: th.leadType, dur: sd * 3, vol: .035 + .01 * (I - 2), bus, lp: 2600, rev: .5, echo: .4 });
   }
+  /* imza motifi: her harita kendi 4 notalık kancasını çalar (menüde de duyulur); 2. frazda tersi cevap verir */
+  const ph = (n / 64) | 0, hk = HOOKS[curTheme] || HOOKS[0], HS = [0, 3, 6, 10];
+  if ((b === 0 || (b === 2 && ph % 2)) && HS.includes(s)) {
+    const j = HS.indexOf(s), idx = b === 0 ? hk[j] : hk[3 - j], fq = mf(th.key + 24 + th.scale[idx % 5] + 12 * ((idx / 5) | 0));
+    voice({ t, f: fq, type: 'triangle', dur: sd * 3.5, vol: .05, bus, lp: 3200, rev: .7, echo: .5 });
+    voice({ t, f: fq * 2, type: 'sine', dur: sd * 2.5, vol: .018, bus, rev: .8 });
+  }
+  /* karşı melodi: vuruş aralarında akor sesleri */
+  if (I >= 1 && (s === 3 || s === 11)) voice({ t, f: mf(root + 12 + ch[s === 3 ? 2 : 1]), type: 'triangle', dur: sd * 1.8, vol: .03, bus, lp: 2200, rev: .4, echo: .35 });
+  /* fraz sonu süpürmesi */
+  if (b === 3 && s === 8 && ph % 2) hit({ t, f: 500, sweep: 6500, type: 'bandpass', q: 1.5, dur: sd * 7, vol: .05, bus, rev: .5 });
   /* parıltı çanları */
   if (th.bell && s % 2 === 0 && Math.random() < th.bell * (I ? .5 : 1) * .35) {
     const idx = (Math.random() * 8) | 0;
@@ -1893,7 +2056,7 @@ function finish(win) {
   }
   S.st.games++; if (win) S.st.wins++;
   const mult = 1 + .1 * S.up.u3 + B.coin;
-  earned = Math.round((Math.floor(score / 60) + bonusCoins + (win ? 150 : 0)) * mult);
+  earned = Math.round((Math.floor(score / 60) + bonusCoins + (win ? 150 : 0)) * mult) + nearCoins;
   S.coins += earned;
   S.sc.push({ s: score, k: shards, w: win ? 1 : 0, lv: level, m: S.map });
   S.sc.sort((a, b) => b.s - a.s); S.sc = S.sc.slice(0, 8);
@@ -1911,7 +2074,7 @@ function finish(win) {
     $('hud').classList.add('off'); st = 'over'; show('over');
     countUp($('os'), score, 1100);
     giveXp(Math.floor(score / 40) + level * 10 + (win ? 100 : 0)); sv();
-    $('oAdT').textContent = t('adDouble'); $('oAd').style.display = CG.ok && !CG.adblock ? '' : 'none';
+    $('oAdT').textContent = t('adDouble'); $('oAd').style.display = adsOn() ? '' : 'none'; setTimeout(() => { if (st === 'over') cgBanner(true); }, 700);
     menuStats();
   }, win ? 2000 : 1100);
 }
@@ -1971,8 +2134,8 @@ function step() {
         return die();
       }
       if (d < 44 && g.cd <= 0 && !invul) {
-        g.cd = 55; score += 100; bonusCoins += 10; runNear++; S.st.near++;
-        txt(P.x, P.y - 28, t('near') + ' +100', '#ff9a9d', 17); txt(P.x, P.y - 52, '+10 ' + t('coin'), '#ffd27a', 15); SFX.near();
+        g.cd = 55; score += 100; nearCoins += 10; runNear++; S.st.near++;
+        txt(P.x, P.y - 28, t('near') + ' +100', '#ff9a9d', 17); txt(P.x, P.y - 50, '+10 ' + t('coin'), '#ffd27a', 15); SFX.near(); SFX.gem();
         burst(P.x, P.y, '#ff5a5f', 6, 200, 'ci'); updateHud(); checkAch();
       }
     }
@@ -2011,8 +2174,8 @@ function takeOrb() {
   else if (o.type === 'nova') {
     clearGhosts(true); SFX.nova(); flash = .5; flashC = '190,150,255'; shake = 14; zoom = 1.035;
     ring(o.x, o.y, '190,150,255', 1100, 1.1, 6); txt(o.x, o.y - 24, t('oNova'), '#d8c0ff', 22);
-  } else if (o.type === 'chrono') { chrono = 5; flash = .4; flashC = '150,190,255'; ring(P.x, P.y, '150,190,255', 900, 1, 5); txt(o.x, o.y - 24, t('freeze'), '#bcd4ff', 22); SFX.nova(); }
-  else if (o.type === 'surge') { surge = 8; flash = .35; flashC = '255,110,200'; ring(P.x, P.y, '255,110,200', 800, 1, 5); txt(o.x, o.y - 24, t('over2'), '#ff9ad5', 22); SFX.level(); }
+  } else if (o.type === 'chrono') { chrono = 5; flash = .4; flashC = '150,190,255'; ring(P.x, P.y, '150,190,255', 900, 1, 5); txt(o.x, o.y - 24, t('oChrono'), '#bcd4ff', 22); SFX.nova(); }
+  else if (o.type === 'surge') { surge = 8; flash = .35; flashC = '255,110,200'; ring(P.x, P.y, '255,110,200', 800, 1, 5); txt(o.x, o.y - 24, t('oSurge'), '#ff9ad5', 22); SFX.level(); }
   else { bonusCoins += 25; score += 250; SFX.gem(); txt(o.x, o.y - 24, '+25 ' + t('coin'), '#7dffc8', 20); }
   vib(25); updateHud();
 }
@@ -2223,6 +2386,21 @@ function drawGauge(c) {
   c.beginPath(); c.arc(cx + TILT.gx * R, cy - TILT.gy * R, 5, 0, TAU); c.fill();
   c.restore();
 }
+function drawDust(c) {
+  if (!DUST) return;
+  c.save(); c.globalCompositeOperation = 'lighter';
+  for (const d of DUST) {
+    const x = ((d.x + T * d.vx) % W + W) % W, y = ((d.y + T * d.vy + Math.sin(T * d.f + d.p) * 14) % H + H) % H;
+    c.fillStyle = `rgba(255,236,190,${d.a * (.55 + .45 * Math.sin(T * d.f * 1.7 + d.p))})`;
+    c.beginPath(); c.arc(x, y, d.r, 0, TAU); c.fill();
+  }
+  c.restore();
+}
+function drawPlayerGlow(c, sk) {
+  const R = P.r * 7, rgb = skRGB(sk, T, 0), g = c.createRadialGradient(P.x, P.y, 0, P.x, P.y, R);
+  g.addColorStop(0, `rgba(${rgb},.30)`); g.addColorStop(1, `rgba(${rgb},0)`);
+  c.save(); c.globalCompositeOperation = 'lighter'; c.fillStyle = g; c.fillRect(P.x - R, P.y - R, R * 2, R * 2); c.restore();
+}
 function drawParts(c) {
   c.save(); c.globalCompositeOperation = 'lighter';
   for (const p of parts) {
@@ -2244,50 +2422,30 @@ function drawFx(c) {
   c.textAlign = 'center'; c.textBaseline = 'middle'; c.lineJoin = 'round';
   for (const q of texts) {
     c.globalAlpha = clamp(q.l * 2, 0, 1);
-    c.font = `800 ${q.z}px Sora, system-ui, sans-serif`;
+    c.font = `800 ${q.z}px system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif`;
     c.lineWidth = 4; c.strokeStyle = 'rgba(0,0,0,.55)'; c.strokeText(q.s, q.x, q.y);
     c.fillStyle = q.c; c.fillText(q.s, q.x, q.y);
   }
   c.restore();
 }
 
-const MOTES = Array.from({ length: 36 }, () => ({ x: Math.random(), y: Math.random(), r: rnd(1, 3), s: rnd(.01, .04), p: Math.random() * TAU }));
-function drawMotes(c) {
-  c.save(); c.globalCompositeOperation = 'lighter';
-  for (const m of MOTES) {
-    const x = (m.x + Math.sin(T * m.s * 8 + m.p) * .02) * W, y = (((m.y - T * m.s) % 1) + 1) % 1 * H, a = .06 + .1 * Math.pow(Math.sin(T * 1.5 + m.p), 2);
-    glowC(c, x, y, m.r * 5, '255,240,210', a);
-  }
-  c.restore();
-}
-let GRAIN = null;
-function drawGrain(c) {
-  if (!GRAIN) {
-    const g = document.createElement('canvas'); g.width = g.height = 128;
-    const x = g.getContext('2d'), d = x.createImageData(128, 128);
-    for (let i = 0; i < d.data.length; i += 4) { const v = (Math.random() * 255) | 0; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
-    x.putImageData(d, 0, 0); GRAIN = c.createPattern(g, 'repeat');
-  }
-  c.save(); c.globalAlpha = .05; c.globalCompositeOperation = 'overlay';
-  c.translate((frame * 37) % 128, (frame * 61) % 128); c.fillStyle = GRAIN; c.fillRect(-128, -128, W + 256, H + 256);
-  c.restore();
-}
 function draw() {
   const c = ctx;
   c.setTransform(DPR, 0, 0, DPR, 0, 0);
   c.globalAlpha = 1; c.globalCompositeOperation = 'source-over';
-  MAPS[mapIdx()].draw(c, bgState, W, H, T); drawMotes(c);
+  MAPS[mapIdx()].draw(c, bgState, W, H, T);
   /* kamera: sarsıntı + hafif yakınlaşma yalnızca oyun katmanında */
   const sh = S.shake ? shake : 0;
   c.setTransform(DPR * zoom, 0, 0, DPR * zoom,
     (W / 2 * (1 - zoom) + (sh > .2 ? rnd(-sh, sh) : 0)) * DPR, (H / 2 * (1 - zoom) + (sh > .2 ? rnd(-sh, sh) : 0)) * DPR);
   const sk = curSkin(), playing = st === 'play' || st === 'count', alive = st !== 'dead' && st !== 'over';
+  drawDust(c);
   for (const g of ghosts) if (g.on) drawGhostTrail(c, g);
   if (shard) drawShard(c, shard);
   if (orb) drawOrb(c, orb);
   for (const g of ghosts) if (g.on) drawGhost(c, g);
   if (alive) {
-    playerTrail(sk);
+    playerTrail(sk); drawPlayerGlow(c, sk);
     c.save();
     if (invul > 0 && ((invul >> 2) & 1)) c.globalAlpha = .4;
     drawSkin(c, sk, P.x, P.y, P.r, T);
@@ -2299,7 +2457,7 @@ function draw() {
   /* ekran katmanı */
   c.setTransform(DPR, 0, 0, DPR, 0, 0);
   if (VIG) c.drawImage(VIG, 0, 0, W, H);
-  drawGrain(c);
+  if (GPAT) { if (frame % 3 === 0) gOff = [(Math.random() * 128) | 0, (Math.random() * 128) | 0]; c.save(); c.translate(-gOff[0], -gOff[1]); c.globalAlpha = .06; c.globalCompositeOperation = 'overlay'; c.fillStyle = GPAT; c.fillRect(gOff[0], gOff[1], W + 128, H + 128); c.restore(); }
   if (playing && useTilt()) drawGauge(c);
   if (danger > .02 && RVIG) {
     c.globalAlpha = clamp(danger * (.5 + .4 * Math.sin(T * 10)), 0, .85);
@@ -2318,6 +2476,7 @@ const fmt = n => Number(n).toLocaleString(S.lang);
 
 /* Ekran geçişi: yalnızca biri açık, diğerleri 'inert' (klavye odağı almaz) */
 function show(name) {
+  if (name !== 'over') cgBanner(false);
   if (name && curScreen && name !== curScreen) navFrom = curScreen;
   const changed = name !== curScreen;
   SCREENS.forEach(id => {
@@ -2348,11 +2507,11 @@ function applyLang() {
   document.querySelectorAll('[data-i]').forEach(el => { el.textContent = t(el.dataset.i); });
   document.querySelectorAll('.hdr .rbtn').forEach(b => b.setAttribute('aria-label', t('back')));
   $('pb').setAttribute('aria-label', t('pause'));
-  renderHelp();
+  renderHelp(); $('shopAdT').textContent = t('adCoins', AD_COINS);
 }
 function setLang(code) {
   if (!L[code]) return;
-  S.lang = code; sv(); applyLang(); renderSettings(); menuStats(); measure();
+  S.lang = code; S.langSet = 1; sv(); applyLang(); renderSettings(); menuStats(); measure();
   if (curScreen === 'shop') renderShop(); else if (curScreen === 'board') renderBoard();
 }
 
@@ -2403,6 +2562,7 @@ function poor() {
 function renderShop(anim) {
   $('shopTabs').innerHTML = tabsHtml([['skin', 'sparkles', 'tabSkin'], ['map', 'map', 'maps'], ['up', 'zap', 'tabUp']], shopTab, 'setShopTab');
   menuStats();
+  $('shopAd').style.display = adsOn() ? '' : 'none'; $('shopAdT').textContent = t('adCoins', AD_COINS);
   previews = previews.filter(p => p.scr !== 'shop');
   let h = '';
   if (shopTab === 'skin') {
@@ -2525,7 +2685,6 @@ function chooseCtrl(id) {
   S.ctrl = id; S.ctrlSeen = 1; sv(); play();
 }
 function tryPlay() { if (!S.ctrlSeen) show('ctrl'); else play(); }
-function setTiltRef(id) { S.tiltRef = id; sv(); if (id === 'start') calibrate(); renderSettings(); }
 function renderSettings() {
   const vm = $('vm'), vs = $('vs'), vn = $('vsn');
   vm.value = S.music; vs.value = S.sfx; fillRange(vm); fillRange(vs);
@@ -2534,9 +2693,6 @@ function renderSettings() {
   $('vk').classList.toggle('on', !!S.shake); $('vh').classList.toggle('on', !!S.haptic);
   $('cg').innerHTML = [['tilt', 'cTilt', 'cTiltS'], ['touch', 'cTouch', 'cTouchS']].map(([id, a, b]) =>
     `<button class="lang ${S.ctrl === id ? 'sel' : ''}" onclick="setCtrl('${id}')"><b>${t(a)}</b><span>${t(b)}</span></button>`).join('');
-  $('tg').style.display = S.ctrl === 'tilt' ? '' : 'none';
-  $('tg').innerHTML = [['flat', 'trFlat', 'trFlatS'], ['start', 'trStart', 'trStartS']].map(([id, a, b]) =>
-    `<button class="lang ${S.tiltRef === id ? 'sel' : ''}" onclick="setTiltRef('${id}')"><b>${t(a)}</b><span>${t(b)}</span></button>`).join('');
   $('lg').innerHTML = Object.keys(L).map(k =>
     `<button class="lang ${k === S.lang ? 'sel' : ''}" onclick="setLang('${k}')"><b>${L[k].n}</b><span>${k.toUpperCase()}</span></button>`).join('');
 }
@@ -2561,12 +2717,13 @@ function hudTick(rdt) {
 
 /* ---------- Oyun akışı: başlat, duraklat, çık ---------- */
 function play(skipAd) {
-  if (st === 'over' && !skipAd && CG.ok && ++CG.runs % 2 === 0 && performance.now() - (CG.lastAd || 0) > 90000) { cgAd('midgame', () => play(true)); return; }
+  if (st === 'over' && !skipAd && realAds() && ++CG.runs >= 2 && performance.now() - CG.lastAd > 100000) { CG.runs = 0; cgAd('midgame', () => play(true)); return; }
+  cgBanner(false);
   initAudio(); clearTimeout(overTimer); lockPortrait(); B = { spd: 1, life: 1, coin: 0, cw: 0, mg: 0, sc: 1, lag: 0 }; surge = chrono = 0; $('boon').classList.remove('on');
   /* eğim izni, dokunuş olayının içinde (senkron) istenmeli: o yüzden en başta */
   tiltFail = false;
   if (S.ctrl === 'tilt') startTilt().then(ok => { if (!ok && S.ctrl === 'tilt') failTilt(); });
-  score = shards = inLevel = bonusCoins = runNear = missLv = 0; level = 1; combo = 1; comboT = 0;
+  score = shards = inLevel = bonusCoins = nearCoins = runNear = missLv = 0; level = 1; combo = 1; comboT = 0;
   orbCd = rnd(10, 14); countT = 0; countStage = -1; earned = 0; dispScore = 0; shownScore = -1;
   shield = S.up.u2 >= 1;
   reset(); st = 'count';
@@ -2581,7 +2738,7 @@ function pauseT() {
     prevSt = st; st = 'pause'; cgPlay(false); musFilter(600);
     $('pi').textContent = `${t('lv')} ${level} · ${shards} ${t('k')} · ${fmt(score)}`;
     $('pb').querySelector('use').setAttribute('href', '#i-play');
-    $('pCal').style.display = useTilt() && S.tiltRef === 'start' ? '' : 'none';
+    $('pCal').style.display = useTilt() ? '' : 'none';
     show('pause');
   } else if (st === 'pause') {
     st = prevSt; show(null); cgPlay(true); musFilter(20000); last = performance.now();
@@ -2651,6 +2808,8 @@ document.addEventListener('visibilitychange', () => {
   if (ac) { if (document.hidden) ac.suspend(); else ac.resume(); }
 });
 addEventListener('contextmenu', e => e.preventDefault());
+addEventListener('wheel', e => e.preventDefault(), { passive: false });
+document.addEventListener('gesturestart', e => e.preventDefault());
 function refreshScreen() {
   if (curScreen === 'shop') renderShop();
 }
